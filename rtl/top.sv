@@ -1,5 +1,4 @@
-/* verilator lint_off UNDRIVEN */
-/* verilator lint_off UNUSED */
+`include "types.sv"
 
 module top #(
   parameter ADDR_WIDTH = 32,
@@ -23,7 +22,32 @@ module top #(
   input var rst
 );
 
-assign mem_req_valid = '0;
-assign mem_resp_ready = '0;
+decoupled #(
+  .Data(bit[ADDR_WIDTH-1:0])
+) mem_req;
 
-endmodule
+decoupled #(
+  .Data(bit[DATA_WIDTH-1:0])
+) mem_resp;
+
+assign mem_req_addr = mem_req.data;
+assign mem_req_valid = mem_req.valid;
+assign mem_req.ready = mem_req_ready;
+
+assign mem_resp.data = mem_resp_data;
+assign mem_resp.valid = mem_resp_valid;
+assign mem_resp_ready = mem_resp.ready;
+
+cpu #(
+  INT_SRC_CNT
+) cpu (
+  .mem_req,
+  .mem_resp,
+
+  .ints,
+
+  .clk,
+  .rst
+);
+
+endmodule : top
