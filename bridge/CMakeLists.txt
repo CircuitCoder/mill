@@ -37,6 +37,7 @@ verilate(
   SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../rtl/top.sv
   PREFIX rtl
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/verilated
+  VERILATOR_ARGS -Wall
 )
 
 install(TARGETS millrtl)

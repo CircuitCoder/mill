@@ -343,3 +343,6 @@ hs_err_pid*
 # Added by cargo
 
 /target
+
+# Meow's addition
+bridge/build

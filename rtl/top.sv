@@ -1,23 +1,26 @@
-module Top #(
+/* verilator lint_off UNDRIVEN */
+/* verilator lint_off UNUSED */
+
+module top #(
   parameter ADDR_WIDTH = 32,
   parameter DATA_WIDTH = 32,
   parameter INT_SRC_CNT = 1
 ) (
   // Memory request
-  output [ADDR_WIDTH-1:0] mem_req_addr,
-  output mem_req_valid,
-  input mem_req_ready,
+  output var [ADDR_WIDTH-1:0] mem_req_addr,
+  output var mem_req_valid,
+  input var mem_req_ready,
 
   // Memory response
-  input [DATA_WIDTH-1:0] mem_resp_data,
-  input mem_resp_valid,
-  output mem_resp_ready,
+  input var [DATA_WIDTH-1:0] mem_resp_data,
+  input var mem_resp_valid,
+  output var mem_resp_ready,
 
-  input [INT_SRC_CNT-1:0] ints,
+  input var [INT_SRC_CNT-1:0] ints,
 
   // Clock and reset
-  input clk,
-  input rst
+  input var clk,
+  input var rst
 );
 
 assign mem_req_valid = '0;

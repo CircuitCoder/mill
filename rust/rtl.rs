@@ -18,10 +18,10 @@ mod ffi {
         pub fn mem_req(cpu: &mut UniquePtr<CPU>) -> UniquePtr<MemReq>;
         pub fn mem_resp(cpu: &mut UniquePtr<CPU>) -> UniquePtr<MemResp>;
 
-        fn read(req: &mut UniquePtr<MemReq>, addr: &mut u64) -> bool;
-        fn no_read(req: &mut UniquePtr<MemReq>);
+        pub fn read(req: &mut UniquePtr<MemReq>, addr: &mut u64) -> bool;
+        pub fn no_read(req: &mut UniquePtr<MemReq>);
 
-        fn write(resp: &mut UniquePtr<MemResp>, packed_data: &Vec<u64>) -> bool;
-        fn no_write(resp: &mut UniquePtr<MemResp>);
+        pub fn write(resp: &mut UniquePtr<MemResp>, packed_data: &Vec<u64>) -> bool;
+        pub fn no_write(resp: &mut UniquePtr<MemResp>);
     }
 }
