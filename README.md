@@ -1,7 +1,12 @@
 Mill
 =======================
 
-> mill \[verb\] (transitive) To grind or otherwise process in a mill or other machine.
+> \[verb\] (transitive) To grind or otherwise process in a mill or other machine.
+
+## What's in the box?
+- A test framework, which test the CPU against:
+  - riscv/riscv-tests
+- A educational 5-stage(?) RV32I implementation with SystemVerilog
 
 ## CPU interface
 
