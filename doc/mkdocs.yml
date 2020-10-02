@@ -1,0 +1,18 @@
+site_name: Mill
+repo_url: https://github.com/CircuitCoder/mill
+edit_uri: edit/master/doc/docs/
+theme:
+  name: material
+  palette:
+    primary: blue grey
+    accent: orange
+  features:
+    - navigation.tabs
+    - navigation.instant
+
+nav:
+  - 主页: index.md
+  - 开发日志:
+    - 主页: timeline/index.md
+    - 日志项目:
+      - "2020-10-03": timeline/2020-10-03.md

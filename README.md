@@ -7,6 +7,10 @@ Mill
 - A test framework, which test the CPU against:
   - riscv/riscv-tests
 - A educational 5-stage(?) RV32I implementation with SystemVerilog
+- Documentation (in zh-CN), including
+  - The usage of the test framework
+  - The design of the CPU implementation
+  - The timeline of the development
 
 ## CPU interface
 
