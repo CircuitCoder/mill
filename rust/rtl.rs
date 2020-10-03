@@ -27,6 +27,8 @@ mod ffi {
 use std::path::PathBuf;
 
 use cxx::UniquePtr;
+
+use crate::mem::Mem;
 pub struct CPU(UniquePtr<ffi::CPU>);
 impl CPU {
     pub fn new(extra: &Vec<String>, trace: &Option<PathBuf>) -> Self {
@@ -47,5 +49,35 @@ impl CPU {
 
     pub fn set_rst(&mut self, rst: bool) {
         ffi::set_rst(&mut self.0, rst);
+    }
+    
+    pub fn mem(&mut self) -> MemInterface {
+        MemInterface {
+            req: ffi::mem_req(&mut self.0),
+            resp: ffi::mem_resp(&mut self.0),
+            pending: None,
+        }
+    }
+}
+
+pub struct MemInterface {
+    req: UniquePtr<ffi::MemReq>,
+    resp: UniquePtr<ffi::MemResp>,
+    pending: Option<u64>,
+}
+
+impl MemInterface {
+    pub fn handle_single_tick(&mut self, mem: &mut Mem) {
+        if let Some(pending) = self.pending {
+            // Process pending request from the previous cycle
+            ffi::no_read(&mut self.req);
+        } else {
+            let mut addr: u64 = 0;
+            let has_req = ffi::read(&mut self.req, &mut addr);
+
+            if !has_req {
+                return;
+            }
+        }
     }
 }

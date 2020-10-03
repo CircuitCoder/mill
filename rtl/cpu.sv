@@ -4,7 +4,7 @@
 
 module cpu #(
   parameter INT_SRC_CNT = 1,
-  parameter [31:0] BOOT_VEC = 0
+  parameter [31:0] BOOT_VEC = 'h80000000
 ) (
   decoupled.out mem_req,
   decoupled.in mem_resp,

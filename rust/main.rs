@@ -1,9 +1,13 @@
 mod rtl;
+mod mem;
 
+use std::fs::File;
 use std::num::ParseIntError;
 use std::path::PathBuf;
 use std::str::FromStr;
 
+use anyhow::Error;
+use mem::Mem;
 use structopt::StructOpt;
 
 #[derive(Debug)]
@@ -53,22 +57,38 @@ struct Args {
 }
 
 #[paw::main]
-fn main(args: Args) {
+fn main(args: Args) -> Result<(), Error>{
     env_logger::init();
 
     log::debug!("With arguments: {:#?}", args);
 
+    let mut mem = Mem::default();
+
+    if let Some(mem_file) = args.mem {
+        let f = File::open(mem_file)?;
+        mem.init_with(f, args.mem_base.0)?;
+    }
+
+    log::debug!("Creating CPU...");
     let mut cpu = rtl::CPU::new(
         &args.extra,
         &args.trace,
     );
     cpu.set_rst(true);
 
+    log::debug!("Creating MemInterface...");
+    let mut mem_handler = cpu.mem();
+
     for cycle in 0..args.cycles {
         if cycle == args.reset_for {
             cpu.set_rst(false);
         }
 
+        mem_handler.handle_single_tick(&mut mem);
+
         cpu.tick();
     }
+
+    log::debug!("Simulation done");
+    Ok(())
 }

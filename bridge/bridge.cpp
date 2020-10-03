@@ -27,8 +27,6 @@ namespace mill::bridge {
     CPUImpl(const rust::Str trace) {
       backend.rst = 1; // Initialize with reset
       backend.clk = 1; // Initialize to inactive clock edge
-      mem_req_impl = new MemReqImpl(this);
-      mem_resp_impl = new MemRespImpl(this);
 
       if(trace.size() != 0) {
         Verilated::traceEverOn(true);
@@ -42,20 +40,17 @@ namespace mill::bridge {
     }
 
     ~CPUImpl() {
-      delete this->mem_req_impl;
-      delete this->mem_resp_impl;
-
       backend.final();
       if(tracer)
         tracer->close();
     }
 
     MemReq* mem_req() override {
-      return this->mem_req_impl;
+      return new MemReqImpl(this);
     }
 
     MemResp* mem_resp() override {
-      return this->mem_resp_impl;
+      return new MemRespImpl(this);
     }
 
     void set_int(size_t n) override {
@@ -136,8 +131,6 @@ namespace mill::bridge {
 
     rtl backend;
     std::optional<VerilatedFstC> tracer = std::nullopt;
-    MemReqImpl *mem_req_impl;
-    MemRespImpl *mem_resp_impl;
   };
 
   std::unique_ptr<CPU> init(const rust::Vec<rust::String> &args, const rust::Str trace) {

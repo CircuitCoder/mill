@@ -348,3 +348,4 @@ hs_err_pid*
 bridge/build
 *.fst
 *.bin
+data
