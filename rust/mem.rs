@@ -6,7 +6,7 @@ use anyhow::{anyhow, Error};
 
 #[derive(Default)]
 pub struct Mem {
-    mem: HashMap<u64, u32>,
+    pub(crate) mem: HashMap<u64, u32>,
 }
 
 impl Mem {

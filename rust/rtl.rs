@@ -71,12 +71,27 @@ impl MemInterface {
         if let Some(pending) = self.pending {
             // Process pending request from the previous cycle
             ffi::no_read(&mut self.req);
+            let data = mem.mem.get(&pending).cloned().unwrap_or(0);
+            let data_pack = vec![data as u64];
+            let resp = ffi::write(&mut self.resp, &data_pack);
+            if resp {
+                self.pending = None;
+            }
         } else {
             let mut addr: u64 = 0;
             let has_req = ffi::read(&mut self.req, &mut addr);
 
             if !has_req {
+                ffi::no_write(&mut self.resp);
                 return;
+            }
+
+            let data = mem.mem.get(&addr).cloned().unwrap_or(0);
+            let data_pack = vec![data as u64];
+            let resp = ffi::write(&mut self.resp, &data_pack);
+
+            if !resp {
+                self.pending = Some(addr);
             }
         }
     }
