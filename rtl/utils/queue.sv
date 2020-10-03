@@ -8,7 +8,7 @@
 // TODO: flush
 module queue #(
   parameter type Data = gpreg,
-  parameter int DEPTH = 1
+  parameter int DEPTH = 2
 ) (
   decoupled.in enq,
   decoupled.out deq,
@@ -40,7 +40,7 @@ always_ff @(posedge clk or posedge rst) begin
 end
 
 always_ff @(posedge clk) begin
-  if(enq.fire()) queue[tail] <= enq.data;
+  if(enq.fire()) store[tail] <= enq.data;
 end
 
 endmodule

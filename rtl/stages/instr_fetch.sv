@@ -19,28 +19,37 @@ module instr_fetch #(
   input rst
 );
 
-localparam int INSTR_COUNTER = $clog2(MAX_FETCHING_INSTR);
+localparam int INSTR_COUNTER = $clog2(MAX_FETCHING_INSTR+1);
 bit [INSTR_COUNTER-1:0] cnt;
-localparam int BOUND = MAX_FETCHING_INSTR - 1;
+localparam [INSTR_COUNTER-1:0] BOUND = MAX_FETCHING_INSTR[0 +: INSTR_COUNTER];
 
 // TODO: flush logic
+wire _unused_flush = flush;
+
 assign mem_req.data = pc.data;
 assign mem_req.valid = pc.valid && cnt !== BOUND;
 assign pc.ready = mem_req.ready;
 
-// TODO: buffer for one cycle!
-assign mem_resp.ready = fetched.ready;
-assign fetched.data = mem_resp.data;
-assign fetched.valid = mem_resp.valid;
+// Buffer for one cycle
+queue #(
+  .Data(instr),
+  .DEPTH(2)
+) buffer (
+  .enq(mem_resp),
+  .deq(fetched),
+
+  .clk,
+  .rst
+);
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
     cnt <= 0;
   end else begin
-    if(mem_req.fire() && !mem_resp().fire()) begin
+    if(mem_req.fire() && !mem_resp.fire()) begin
       cnt <= cnt + 1;
     end
-    if(!mem_req.fire() && mem_resp().fire()) begin
+    if(!mem_req.fire() && mem_resp.fire()) begin
       cnt <= cnt - 1;
     end
   end

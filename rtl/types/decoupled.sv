@@ -8,8 +8,21 @@ interface decoupled #(
   bit valid;
   bit ready;
 
-  modport out (output data, output valid, input ready);
-  modport in (input data, input valid, output ready);
+  modport out (
+    output data,
+    output valid,
+    input ready,
+
+    import fire
+  );
+
+  modport in (
+    input data,
+    input valid,
+    output ready,
+
+    import fire
+  );
 
   function bit fire();
     fire = valid && ready;
