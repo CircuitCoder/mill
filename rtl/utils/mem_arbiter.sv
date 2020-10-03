@@ -70,7 +70,7 @@ for(genvar i = 0; i < CNT; i = i+1) begin
 end
 
 // Mitigate bug
-assign slave_req.valid = has_req && buffer_in.ready;
+assign slave_req.valid = has_req && buffer_in.ready && !rst;
 assign buffer_in.valid = slave_req.fire();
 
 // Response arbiter logic
@@ -84,7 +84,7 @@ for (genvar i = 0; i < CNT; i = i+1) begin
   assign master_ready[i] = master_resp[i].ready;
 end
 
-assign slave_resp.ready = master_ready[buffer_out.data];
+assign slave_resp.ready = master_ready[buffer_out.data] && !rst;
 assign buffer_out.ready = slave_resp.fire();
 
 endmodule : mem_arbiter
