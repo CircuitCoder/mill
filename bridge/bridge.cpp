@@ -26,6 +26,7 @@ namespace mill::bridge {
   public:
     CPUImpl(const rust::Str trace) {
       backend.rst = 1; // Initialize with reset
+      backend.clk = 1; // Initialize to inactive clock edge
       mem_req_impl = new MemReqImpl(this);
       mem_resp_impl = new MemRespImpl(this);
 
@@ -36,6 +37,8 @@ namespace mill::bridge {
         std::string std_trace = std::string(trace);
         tracer->open(std_trace.c_str());
       }
+
+      this->backend.eval();
     }
 
     ~CPUImpl() {
@@ -57,34 +60,34 @@ namespace mill::bridge {
 
     void set_int(size_t n) override {
       this->backend.ints |= 1 << n;
+      this->backend.eval();
     }
 
     void clear_int(size_t n) override {
       this->backend.ints &= ~(1 << n);
+      this->backend.eval();
     }
 
     void set_rst(bool rst) override {
       this->backend.rst = rst;
+      this->backend.eval();
     }
 
     bool tick() override {
-      // clk % 2 == 0, first half cycle
-      backend.clk = 1;
-      backend.eval();
-      ++clk;
-
+      // clk % 2 == 0, we are on the inactive clock edge
       if(tracer)
         tracer->dump(clk);
 
-      // TODO: flush write
-
-      // clk % 2 == 1, second half cycle
-      backend.clk = 0;
+      backend.clk = 0; // Negedge clk
       backend.eval();
       ++clk;
 
+      // clk % 2 == 1, we are on the active clock edge
       if(tracer)
         tracer->dump(clk);
+      backend.clk = 1; // Posedge clk
+      backend.eval();
+      ++clk;
 
       return Verilated::gotFinish();
     }
@@ -99,12 +102,14 @@ namespace mill::bridge {
 
         virtual bool read(uint64_t &result) override {
           parent->backend.mem_req_ready = true;
+          parent->backend.eval();
           result = parent->backend.mem_req_addr;
           return parent->backend.mem_req_valid != 0;
         }
 
         virtual void no_read() override {
           parent->backend.mem_req_ready = false;
+          parent->backend.eval();
         }
     };
 
@@ -118,13 +123,14 @@ namespace mill::bridge {
         virtual bool write(const rust::Vec<uint64_t> &packed_data) override {
           parent->backend.mem_resp_valid = true;
           assign_data(parent->backend.mem_resp_data, packed_data);
+          parent->backend.eval();
 
           return parent->backend.mem_resp_ready;
         }
 
         virtual void no_write() override {
           parent->backend.mem_resp_valid = false;
-          // TODO: write X
+          parent->backend.eval();
         }
     };
 
