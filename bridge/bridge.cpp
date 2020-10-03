@@ -129,7 +129,7 @@ namespace mill::bridge {
     };
 
     rtl backend;
-    std::optional<VerilatedFstC> tracer = {};
+    std::optional<VerilatedFstC> tracer = std::nullopt;
     MemReqImpl *mem_req_impl;
     MemRespImpl *mem_resp_impl;
   };

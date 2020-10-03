@@ -1,5 +1,7 @@
 `include "types.sv"
 
+`include "stages/instr_fetch.sv"
+
 module cpu #(
   parameter INT_SRC_CNT = 1,
   parameter [31:0] BOOT_VEC = 0

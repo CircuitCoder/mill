@@ -10,6 +10,10 @@ interface decoupled #(
 
   modport out (output data, output valid, input ready);
   modport in (input data, input valid, output ready);
+
+  function bit fire();
+    fire = valid && ready;
+  endfunction
 endinterface
 
 `endif // __DECOUPLED_SV_
