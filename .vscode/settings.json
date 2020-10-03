@@ -10,5 +10,6 @@
     "ranges": "cpp",
     "utility": "cpp",
     "string": "cpp"
-  }
+  },
+  "verilog.linting.verilator.arguments": "-Wall -Irtl --lint-only"
 }

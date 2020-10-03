@@ -1,5 +1,5 @@
-`ifndef __DECOUPLED_SV_
-`define __DECOUPLED_SV_
+`ifndef __DECOUPLED_SV__
+`define __DECOUPLED_SV__
 
 interface decoupled #(
   parameter type Data = bit
@@ -14,6 +14,6 @@ interface decoupled #(
   function bit fire();
     fire = valid && ready;
   endfunction
-endinterface
+endinterface : decoupled
 
-`endif // __DECOUPLED_SV_
+`endif // __DECOUPLED_SV__
