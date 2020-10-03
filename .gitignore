@@ -346,3 +346,5 @@ hs_err_pid*
 
 # Meow's addition
 bridge/build
+*.fst
+*.bin

@@ -1,5 +1,3 @@
-pub use ffi::*;
-
 #[cxx::bridge(namespace = "mill::bridge")]
 mod ffi {
     extern "C" {
@@ -23,5 +21,31 @@ mod ffi {
 
         pub fn write(resp: &mut UniquePtr<MemResp>, packed_data: &Vec<u64>) -> bool;
         pub fn no_write(resp: &mut UniquePtr<MemResp>);
+    }
+}
+
+use std::path::PathBuf;
+
+use cxx::UniquePtr;
+pub struct CPU(UniquePtr<ffi::CPU>);
+impl CPU {
+    pub fn new(extra: &Vec<String>, trace: &Option<PathBuf>) -> Self {
+        let inner = ffi::init(
+            &extra,
+            trace
+                .as_ref()
+                .and_then(|p| p.as_os_str().to_str())
+                .unwrap_or(""),
+        );
+
+        Self(inner)
+    }
+
+    pub fn tick(&mut self) {
+        ffi::tick(&mut self.0);
+    }
+
+    pub fn set_rst(&mut self, rst: bool) {
+        ffi::set_rst(&mut self.0, rst);
     }
 }

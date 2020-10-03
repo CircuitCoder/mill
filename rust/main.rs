@@ -28,6 +28,14 @@ impl FromStr for Addr {
     setting = structopt::clap::AppSettings::AllowLeadingHyphen,
 )]
 struct Args {
+    /// Maximum cycle count
+    #[structopt(short, long, default_value = "100000")]
+    cycles: usize,
+
+    /// Reset cycle count
+    #[structopt(long, default_value = "10")]
+    reset_for: usize,
+
     /// The memory file used to initialize the memory. If not provided, then the memory will be initialized to zero
     #[structopt(short, long)]
     mem: Option<PathBuf>,
@@ -50,12 +58,17 @@ fn main(args: Args) {
 
     log::debug!("With arguments: {:#?}", args);
 
-    let cpu = rtl::init(
+    let mut cpu = rtl::CPU::new(
         &args.extra,
-        args.trace
-            .as_ref()
-            .and_then(|p| p.as_os_str().to_str())
-            .unwrap_or(""),
+        &args.trace,
     );
-    std::mem::drop(cpu);
+    cpu.set_rst(true);
+
+    for cycle in 0..args.cycles {
+        if cycle == args.reset_for {
+            cpu.set_rst(false);
+        }
+
+        cpu.tick();
+    }
 }
