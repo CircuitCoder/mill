@@ -1,6 +1,6 @@
 pub use ffi::*;
 
-#[cxx::bridge(namespace="mill::bridge")]
+#[cxx::bridge(namespace = "mill::bridge")]
 mod ffi {
     extern "C" {
         include!("bridge.h");
@@ -9,7 +9,7 @@ mod ffi {
         type MemResp;
         type CPU;
 
-        pub fn init() -> UniquePtr<CPU>;
+        pub fn init(args: &Vec<String>, trace: &str) -> UniquePtr<CPU>;
         pub fn set_int(cpu: &mut UniquePtr<CPU>, n: usize);
         pub fn clear_int(cpu: &mut UniquePtr<CPU>, n: usize);
         pub fn set_rst(cpu: &mut UniquePtr<CPU>, rst: bool);

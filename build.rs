@@ -1,6 +1,9 @@
 fn main() {
     let dst = cmake::build("bridge");
-    println!("cargo:rustc-link-search=native={}", dst.join("lib").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("lib").display()
+    );
     println!("cargo:rustc-link-lib=dylib=millrtl");
 
     // Rerun on build.rs changes

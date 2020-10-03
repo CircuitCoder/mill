@@ -1,7 +1,12 @@
 #include "rtl.h"
 #include "bridge.h"
 
+#include <verilated_fst_c.h>
+
 #include <concepts>
+#include <vector>
+#include <string>
+#include <optional>
 
 uint64_t clk;
 double sc_time_stamp() {
@@ -19,10 +24,18 @@ namespace mill::bridge {
 
   class CPUImpl : public CPU {
   public:
-    CPUImpl() {
+    CPUImpl(const rust::Str trace) {
       backend.rst = 1; // Initialize with reset
       mem_req_impl = new MemReqImpl(this);
       mem_resp_impl = new MemRespImpl(this);
+
+      if(trace.size() != 0) {
+        Verilated::traceEverOn(true);
+        tracer.emplace();
+        backend.trace(&tracer.value(), 128);
+        std::string std_trace = std::string(trace);
+        tracer->open(std_trace.c_str());
+      }
     }
 
     ~CPUImpl() {
@@ -30,6 +43,8 @@ namespace mill::bridge {
       delete this->mem_resp_impl;
 
       backend.final();
+      if(tracer)
+        tracer->close();
     }
 
     MemReq* mem_req() override {
@@ -58,12 +73,18 @@ namespace mill::bridge {
       backend.eval();
       ++clk;
 
+      if(tracer)
+        tracer->dump(clk);
+
       // TODO: flush write
 
       // clk % 2 == 1, second half cycle
       backend.clk = 0;
       backend.eval();
       ++clk;
+
+      if(tracer)
+        tracer->dump(clk);
 
       return Verilated::gotFinish();
     }
@@ -108,18 +129,28 @@ namespace mill::bridge {
     };
 
     rtl backend;
+    std::optional<VerilatedFstC> tracer = {};
     MemReqImpl *mem_req_impl;
     MemRespImpl *mem_resp_impl;
   };
 
-  std::unique_ptr<CPU> init() {
-    // TODO: parse arguments
+  std::unique_ptr<CPU> init(const rust::Vec<rust::String> &args, const rust::Str trace) {
     // TODO: configurable clock rate
-    const char** argv = nullptr;
-    Verilated::commandArgs(0, argv);
+
+    std::vector<std::string> std_args(args.size());
+    std::vector<const char *> argv(args.size());
+    for(size_t i = 0; i < args.size(); ++i) {
+      std_args[i] = std::string(args[i]);
+      argv[i] = std_args[i].c_str();
+    }
+
+    // Initialize verilator
+    Verilated::commandArgs(args.size(), argv.data());
+
+    // Initialize clk
     clk = 0;
 
-    return std::make_unique<CPUImpl>();
+    return std::make_unique<CPUImpl>(trace);
   }
 
   void set_int(std::unique_ptr<CPU> &cpu, size_t n) {

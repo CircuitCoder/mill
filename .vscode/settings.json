@@ -1,4 +1,14 @@
 {
   "cquery.cacheDirectory": "${workspaceFolder}/.vscode/cquery_cached_index/",
-  "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "files.associations": {
+    "*.wxml": "html",
+    "*.wxss": "css",
+    "array": "cpp",
+    "string_view": "cpp",
+    "initializer_list": "cpp",
+    "ranges": "cpp",
+    "utility": "cpp",
+    "string": "cpp"
+  }
 }

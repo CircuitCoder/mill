@@ -35,7 +35,7 @@ namespace mill::bridge {
     virtual bool tick() = 0;
   };
 
-  std::unique_ptr<CPU> init();
+  std::unique_ptr<CPU> init(const rust::Vec<rust::String> &args, const rust::Str trace);
   void set_int(std::unique_ptr<CPU> &cpu, size_t n);
   void clear_int(std::unique_ptr<CPU> &cpu, size_t n);
   void set_rst(std::unique_ptr<CPU> &cpu, bool rst);
