@@ -83,7 +83,13 @@ assign id_fetched.ready = '1;
 (* keep = "soft" *) wire _unused = &{
   id_fetched.data,
   id_fetched.valid,
+  mem_sub_req[1].ready,
+  mem_sub_resp[1].valid,
+  mem_sub_resp[1].data,
   ints
 };
+
+assign mem_sub_req[1].valid = '0;
+assign mem_sub_resp[1].ready = '0;
 
 endmodule : cpu

@@ -75,7 +75,7 @@ assign buffer_in.valid = slave_req.fire();
 
 // Response arbiter logic
 for (genvar i = 0; i < CNT; i = i+1) begin
-  assign master_resp[i].valid = slave_resp.valid && i === buffer_out.data;
+  assign master_resp[i].valid = slave_resp.valid && i === buffer_out.data && buffer_out.valid;
   assign master_resp[i].data = slave_resp.data;
 end
 
@@ -84,7 +84,7 @@ for (genvar i = 0; i < CNT; i = i+1) begin
   assign master_ready[i] = master_resp[i].ready;
 end
 
-assign slave_resp.ready = master_ready[buffer_out.data] && !rst;
+assign slave_resp.ready = buffer_out.valid && master_ready[buffer_out.data] && !rst;
 assign buffer_out.ready = slave_resp.fire();
 
 endmodule : mem_arbiter

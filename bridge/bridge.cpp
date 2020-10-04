@@ -70,9 +70,6 @@ namespace mill::bridge {
 
     bool tick() override {
       // clk % 2 == 0, we are on the inactive clock edge
-      if(tracer)
-        tracer->dump(clk);
-
       backend.clk = 0; // Negedge clk
       backend.eval();
       ++clk;
@@ -83,6 +80,9 @@ namespace mill::bridge {
       backend.clk = 1; // Posedge clk
       backend.eval();
       ++clk;
+
+      if(tracer)
+        tracer->dump(clk);
 
       return Verilated::gotFinish();
     }
