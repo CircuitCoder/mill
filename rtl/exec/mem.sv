@@ -19,7 +19,8 @@ module mem #(
 
 logic request_sent = '0;
 
-addr raw = decoded.data.rs1_val + decoded.data.imm;
+addr raw;
+assign raw = decoded.data.rs1_val + decoded.data.imm;
 addr aligned = { raw[31:2], 2'b00 };
 logic [1:0] shift = raw[1:0];
 

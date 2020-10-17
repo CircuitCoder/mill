@@ -70,6 +70,8 @@ for(genvar i = 0; i < CNT; i = i+1) begin
   assign master_req[i].ready = slave_req.fire() && sel === i;
 end
 
+assign buffer_in.data = sel;
+
 // Mitigate bug
 assign slave_req.valid = has_req && buffer_in.ready && !rst;
 assign buffer_in.valid = slave_req.fire();
