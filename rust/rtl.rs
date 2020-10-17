@@ -1,5 +1,12 @@
 #[cxx::bridge(namespace = "mill::bridge")]
 mod ffi {
+    // TODO: handle memory write
+    struct MemReqPacket {
+        addr: u64,
+        is_write: bool,
+        data: u32,
+    }
+
     extern "C" {
         include!("bridge.h");
 
