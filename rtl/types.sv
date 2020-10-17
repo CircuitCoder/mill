@@ -2,6 +2,7 @@
 `define __TYPES_SV__
 
 `include "types/decoupled.sv"
+`include "types/decoded_instr.sv"
 
 localparam XLEN = 32;
 

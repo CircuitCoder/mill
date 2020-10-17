@@ -1,6 +1,7 @@
 `include "types.sv"
 
 `include "stages/instr_fetch.sv"
+`include "stages/instr_decode.sv"
 
 module cpu #(
   parameter INT_SRC_CNT = 1,
@@ -61,13 +62,17 @@ mem_arbiter #(
 // Stages
 decoupled #(
   .Data(instr)
-) id_fetched;
+) if_id_fetched;
+
+decoupled #(
+  .Data(decoded_instr)
+) id_ex_decoded;
 
 instr_fetch #(
   .MAX_FETCHING_INSTR(1)
 ) if_inst (
   .pc(if_pc),
-  .fetched(id_fetched),
+  .fetched(if_id_fetched),
   .mem_req(mem_sub_req[0]),
   .mem_resp(mem_sub_resp[0]),
 
@@ -77,12 +82,21 @@ instr_fetch #(
   .rst
 );
 
-assign id_fetched.ready = '1;
+instr_decode #(
+) id_inst (
+  .fetched(if_id_fetched),
+  .decoded(id_ex_decoded),
+
+  .flush('0),
+  .clk, .rst
+);
+
+assign id_ex_decoded.ready = '1;
 
 // Void all unused signals
 (* keep = "soft" *) wire _unused = &{
-  id_fetched.data,
-  id_fetched.valid,
+  id_ex_decoded.data,
+  id_ex_decoded.valid,
   mem_sub_req[1].ready,
   mem_sub_resp[1].valid,
   mem_sub_resp[1].data,
