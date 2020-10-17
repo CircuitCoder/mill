@@ -16,8 +16,8 @@ module alu #(
 
 assign decoded.ready = '1;
 
-logic [31:0] operand1 = decoded.data.rs1_val;
-logic [31:0] operand2;
+logic [31:0] lhs = decoded.data.rs1_val;
+logic [31:0] rhs;
 
 // Instruction is R-type or I-type, hence:
 logic [2:0] funct3 = decoded.data.funct3;
@@ -28,7 +28,7 @@ logic inval_funct7;
 always_comb begin
   unique case(decoded.data.op)
     INSTR_OP_IMM: begin
-      operand2 = decoded.data.imm;
+      rhs = decoded.data.imm;
       unique case(funct3)
         3'b101: // SRxI
           inval_funct7 = funct7 != 7'b0000000 && funct7 != 7'b0100000;
@@ -39,7 +39,7 @@ always_comb begin
       endcase
     end
     INSTR_OP: begin
-      operand2 = decoded.data.rs2_val;
+      rhs = decoded.data.rs2_val;
       unique case(funct3)
         3'b101, 3'b000: // SRx, ADD/SUB
           inval_funct7 = funct7 != 7'b0000000 && funct7 != 7'b0100000;
@@ -55,21 +55,21 @@ gpreg computation;
 always_comb begin
   unique case(funct3)
     0'b000: // ADD/SUB
-      computation = funct7_action_bit ? operand1 - operand2 : operand1 + operand2;
+      computation = funct7_action_bit ? lhs - rhs : lhs + rhs;
     0'b001: // SLL
-      computation = operand1 <<< operand2[4:0];
+      computation = lhs <<< rhs[4:0];
     0'b010: // SLT
-      computation = (signed'(operand1) < signed'(operand2)) ? '1 : '0;
+      computation = (signed'(lhs) < signed'(rhs)) ? '1 : '0;
     0'b011: // SLTU
-      computation = (operand1 < operand2) ? '1 : '0;
+      computation = (lhs < rhs) ? '1 : '0;
     0'b100: // XOR
-      computation = operand1 ^ operand2;
+      computation = lhs ^ rhs;
     0'b101: // SRL / SRA
-      computation = funct7_action_bit ? (signed'(operand1) >>> operand2[4:0]) : (operand1 >> operand2[4:0]);
+      computation = funct7_action_bit ? (signed'(lhs) >>> rhs[4:0]) : (lhs >> rhs[4:0]);
     0'b110: // OR
-      computation = operand1 | operand2;
+      computation = lhs | rhs;
     0'b110: // AND
-      computation = operand1 & operand2;
+      computation = lhs & rhs;
   endcase
 end
 

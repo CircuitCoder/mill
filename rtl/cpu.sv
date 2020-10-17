@@ -199,6 +199,7 @@ execute #(
 );
 
 /* Commit */
+// FIXME: handles branch
 assign commit.ready = '1;
 assign rd_idx = commit.valid ? commit.data.rd_idx : '0;
 assign rd_val = commit.data.rd_val;

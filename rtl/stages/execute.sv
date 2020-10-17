@@ -28,14 +28,17 @@ end
 decoupled #(.Data(decoded_instr)) misc_input;
 decoupled #(.Data(decoded_instr)) alu_input;
 decoupled #(.Data(decoded_instr)) mem_input;
+decoupled #(.Data(decoded_instr)) pcrel_input;
 
 exec_result misc_result;
 exec_result alu_result;
 exec_result mem_result;
+exec_result pcrel_result;
 
 assign misc_input.data = decoded.data;
 assign alu_input.data = decoded.data;
 assign mem_input.data = decoded.data;
+assign pcrel_input.data = decoded.data;
 
 /* Misc (LUI/JALR/Invalid) */
 misc #() misc_inst (
@@ -53,6 +56,14 @@ alu #() alu_inst (
   .flush, .clk, .rst
 );
 
+/* PCRel (AUIPC/B/JAL) */
+pcrel #() pcrel_inst (
+  .decoded(pcrel_input),
+  .result(pcrel_result),
+
+  .flush, .clk, .rst
+);
+
 /* Mem */
 mem #() mem_inst (
   .decoded(mem_input),
@@ -63,9 +74,8 @@ mem #() mem_inst (
   .flush, .clk, .rst
 );
 
-// TODO: PCRel (AUIPC/B/JAL)
-
 // TODO: handle MISC-MEM in misc
+// TODO: handle SYSTEM in misc
 
 /* Arbiter */
 
@@ -93,6 +103,12 @@ always_comb begin
       decoded.ready = mem_input.ready;
       result.valid = mem_input.ready;
       result.data = mem_result;
+    end
+    INSTR_BRANCH, INSTR_JAL, INSTR_AUIPC: begin
+      pcrel_input.valid = decoded.valid;
+      decoded.ready = pcrel_input.ready;
+      result.valid = pcrel_input.ready;
+      result.data = pcrel_result;
     end
   endcase
 end
