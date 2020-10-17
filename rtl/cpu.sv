@@ -41,7 +41,7 @@ always_ff @(posedge clk or posedge rst) begin
   end
 end
 
-// Memory interface
+/* Memory interface */
 decoupled #(
   .Data(addr)
 ) mem_sub_req [2];
@@ -65,7 +65,7 @@ mem_arbiter #(
   .rst
 );
 
-// Components
+/* Components */
 reg_idx rs_idx [2], rd_idx, ex_fb_idx;
 gpreg rs_val [2], rd_val, ex_fb_val;
 
@@ -95,10 +95,7 @@ regfile #(
   .rst
 );
 
-assign rd_idx = '0;
-assign rd_val = '0;
-
-// Stage registers
+/* Stage registers */
 decoupled #(
   .Data(fetched_instr)
 ) if_fetched;
@@ -141,12 +138,27 @@ decoupled #(
   .Data(exec_result)
 ) ex_result;
 
+decoupled #(
+  .Data(exec_result)
+) commit;
+
+queue #(
+  .Data(exec_result),
+  .DEPTH(2),
+  .PIPE(1)
+) ex_commit_queue (
+  .enq(ex_result),
+  .deq(commit),
+
+  .clk, .rst
+);
+
 // We don't need to guard against valid here, because
 // RegFile's read results will only be effective on pipeline move edges
 assign ex_fb_idx = ex_result.data.rd_idx;
 assign ex_fb_val = ex_result.data.rd_val;
 
-// Stages
+/* Stages */
 
 instr_fetch #(
   .MAX_FETCHING_INSTR(1)
@@ -183,7 +195,12 @@ execute #(
   .clk, .rst
 );
 
-assign ex_result.ready = '1;
+/* Commit */
+assign commit.ready = '1;
+assign rd_idx = commit.valid ? commit.data.rd_idx : '0;
+assign rd_val = commit.data.rd_val;
+
+// TODO: branch
 
 // Void all unused signals
 (* keep = "soft" *) wire _unused = &{
