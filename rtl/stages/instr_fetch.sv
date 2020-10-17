@@ -30,17 +30,9 @@ assign mem_req.data = pc.data;
 assign mem_req.valid = pc.valid && cnt !== BOUND;
 assign pc.ready = mem_req.ready;
 
-// Buffer for one cycle
-queue #(
-  .Data(instr),
-  .DEPTH(2)
-) buffer (
-  .enq(mem_resp),
-  .deq(fetched),
-
-  .clk,
-  .rst
-);
+assign fetched.data = mem_resp.data;
+assign fetched.valid = mem_resp.valid;
+assign mem_resp.ready = fetched.ready;
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin

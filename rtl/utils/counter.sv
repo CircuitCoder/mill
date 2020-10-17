@@ -5,19 +5,19 @@ module counter #(
   parameter int BOUND = 1,
   parameter int WIDTH = $clog2(BOUND)
 ) (
-  input tick,
-  output current,
+  input var tick,
+  output var current,
 
-  input clk,
-  input rst
+  input var clk,
+  input var rst
 );
 
 if(BOUND === 1) begin
-  wire _unused = &{ tick, clk, rst };
+  logic _unused = &{ tick, clk, rst };
   assign current = '0;
 end else begin
   parameter WIDTH = $clog2(BOUND);
-  reg [WIDTH-1:0] cnt;
+  logic [WIDTH-1:0] cnt;
   assign current = cnt;
 
   always_ff @(posedge clk or posedge rst) begin

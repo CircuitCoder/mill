@@ -4,11 +4,12 @@
 `include "types.sv";
 
 // TODO: 0-depth queue
-// TODO: fallthrough
 // TODO: flush
 module queue #(
   parameter type Data = gpreg,
-  parameter int DEPTH = 2
+  parameter int DEPTH = 2,
+  parameter bit FALLTHROUGHT = 0,
+  parameter bit PIPE = 0
 ) (
   decoupled.in enq,
   decoupled.out deq,
@@ -25,9 +26,19 @@ idx head, tail;
 wire full = tail + 1 === head;
 wire empty = tail === head;
 
-assign enq.ready = !full;
-assign deq.valid = !empty;
-assign deq.data = store[head];
+if(PIPE) begin
+  assign enq.ready = (!full) || deq.valid;
+end else begin
+  assign enq.ready = !full;
+end
+
+if(FALLTHROUGHT) begin
+  assign deq.valid = !empty || enq.valid;
+  assign deq.data = empty ? enq.data : store[head];
+end else begin
+  assign deq.valid = !empty;
+  assign deq.data = store[head];
+end
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
