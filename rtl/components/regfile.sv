@@ -31,7 +31,7 @@ always_comb begin
     read_data[i] = storage[read_addr[i]];
 
     // Feedback port with lower index takes precedence
-    for(int j = FEEDBACK-1; j > 0; --j) begin
+    for(int j = FEEDBACK-1; j >= 0; --j) begin
       if(read_addr[i] == feedback_addr[j])
         read_data[i] = feedback_data[j];
     end

@@ -4,6 +4,7 @@
 
 `include "stages/instr_fetch.sv"
 `include "stages/instr_decode.sv"
+`include "stages/execute.sv"
 
 `include "types.sv"
 
@@ -95,9 +96,7 @@ regfile #(
 );
 
 assign rd_idx = '0;
-assign ex_fb_idx = '0;
 assign rd_val = '0;
-assign ex_fb_val = '0;
 
 // Stage registers
 decoupled #(
@@ -121,7 +120,31 @@ queue #(
 
 decoupled #(
   .Data(decoded_instr)
-) id_ex_decoded;
+) id_decoded;
+
+decoupled #(
+  .Data(decoded_instr)
+) ex_decoded;
+
+queue #(
+  .Data(decoded_instr),
+  .DEPTH(2),
+  .PIPE(1)
+) id_ex_queue (
+  .enq(id_decoded),
+  .deq(ex_decoded),
+
+  .clk, .rst
+);
+
+decoupled #(
+  .Data(exec_result)
+) ex_result;
+
+// We don't need to guard against valid here, because
+// RegFile's read results will only be effective on pipeline move edges
+assign ex_fb_idx = ex_result.data.rd_idx;
+assign ex_fb_val = ex_result.data.rd_val;
 
 // Stages
 
@@ -142,7 +165,7 @@ instr_fetch #(
 instr_decode #(
 ) id_inst (
   .fetched(id_fetched),
-  .decoded(id_ex_decoded),
+  .decoded(id_decoded),
 
   .rs_idx,
   .rs_val,
@@ -151,12 +174,21 @@ instr_decode #(
   .clk, .rst
 );
 
-assign id_ex_decoded.ready = '1;
+execute #(
+) ex_inst (
+  .decoded(ex_decoded),
+  .result(ex_result),
+
+  .flush('0),
+  .clk, .rst
+);
+
+assign ex_result.ready = '1;
 
 // Void all unused signals
 (* keep = "soft" *) wire _unused = &{
-  id_ex_decoded.data,
-  id_ex_decoded.valid,
+  ex_result.data,
+  ex_result.valid,
   mem_sub_req[1].ready,
   mem_sub_resp[1].valid,
   mem_sub_resp[1].data,

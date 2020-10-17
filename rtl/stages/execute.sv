@@ -18,7 +18,7 @@ module execute #(
 );
 
 always begin
-  $assert(result.ready);
+  assert(result.ready);
 end
 
 decoupled #(.Data(decoded_instr)) misc_input;
@@ -28,6 +28,7 @@ exec_result misc_result;
 exec_result alu_result;
 
 assign misc_input.data = decoded.data;
+assign alu_input.data = decoded.data;
 
 /* Misc (LUI/JALR/Invalid) */
 misc #() misc_inst (
@@ -38,9 +39,9 @@ misc #() misc_inst (
 );
 
 /* ALU */
-misc #() misc_inst (
-  .decoded(misc_input),
-  .result(misc_result),
+alu #() alu_inst (
+  .decoded(alu_input),
+  .result(alu_result),
 
   .flush, .clk, .rst
 );
@@ -51,6 +52,7 @@ misc #() misc_inst (
 
 always_comb begin
   misc_input.valid = '0;
+  alu_input.valid = '0;
   result.valid = '0;
 
   unique case(decoded.data.op)

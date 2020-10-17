@@ -99,8 +99,10 @@ logic has_rs2 = result_fmt != INSTR_U && result_fmt != INSTR_J && result_fmt != 
 logic has_rd = result_fmt != INSTR_S && result_fmt != INSTR_B;
 
 // Prevents circular warning result -> regfile -> result
-reg_idx rs1 = has_rs1 ? from[19:15] : '0;
-reg_idx rs2 = has_rs2 ? from[24:20] : '0;
+reg_idx rs1;
+reg_idx rs2;
+assign rs1 = has_rs1 ? from[19:15] : '0;
+assign rs2 = has_rs2 ? from[24:20] : '0;
 
 assign result.rs1 = rs1;
 assign result.rs2 = rs2;

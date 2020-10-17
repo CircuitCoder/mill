@@ -6,7 +6,7 @@
 module alu #(
 ) (
   decoupled.in decoded,
-  exec_result result,
+  output exec_result result,
 
   input flush,
 
@@ -14,10 +14,10 @@ module alu #(
   input rst
 );
 
-assign decoded.ready = result.ready;
+assign decoded.ready = '1;
 
-logic operand1 = decoded.data.rs1_val;
-logic operand2;
+logic [31:0] operand1 = decoded.data.rs1_val;
+logic [31:0] operand2;
 
 // Instruction is R-type or I-type, hence:
 logic [2:0] funct3 = decoded.data.funct3;
@@ -74,9 +74,15 @@ always_comb begin
 end
 
 // TODO: invalid instruction on invalid funct7
+logic _unused_inval_funct7 = inval_funct7;
+
 assign result.rd_idx = decoded.data.rd;
 assign result.rd_val = computation;
 assign result.br_valid = '0;
+assign result.br_target = 'X;
+
+// ALU is fully combinatory
+logic _unused = &{ clk, rst, flush };
 
 endmodule;
 

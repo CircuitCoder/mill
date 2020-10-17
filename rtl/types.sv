@@ -11,5 +11,6 @@ typedef logic [4:0] reg_idx;
 
 `include "types/decoupled.sv"
 `include "types/instr.sv"
+`include "types/exec_result.sv"
 
 `endif // __TYPES_SV__
