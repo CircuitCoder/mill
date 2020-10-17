@@ -1,8 +1,6 @@
 `ifndef __DECODED_INSTR_SV__
 `define __DECODED_INSTR_SV__
 
-typedef logic [4:0] reg_idx;
-
 typedef enum {
   INSTR_R, INSTR_I, INSTR_S, INSTR_U, INSTR_J, INSTR_B
 } instr_fmt;

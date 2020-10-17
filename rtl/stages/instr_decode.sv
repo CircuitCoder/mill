@@ -1,7 +1,6 @@
 `ifndef __INSTR_DECODE_SV__
 `define __INSTR_DECODE_SV__
 
-`include "types/decoded_instr.sv"
 `include "types.sv"
 
 module instr_decode #(
