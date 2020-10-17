@@ -12,6 +12,8 @@ theme:
 
 nav:
   - 主页: index.md
+  - 测试框架:
+    - GTKWave / FST: usage/gtkwave.md
   - 开发日志:
     - 主页: timeline/index.md
     - 日志项目:
