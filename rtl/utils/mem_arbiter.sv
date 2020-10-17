@@ -34,7 +34,7 @@ decoupled #(
 queue #(
   .Data(master_idx),
   .DEPTH(QUEUE_DEPTH),
-  .FALLTHROUGHT(1)
+  .FALLTHROUGH(1)
 ) buffer (
   .enq(buffer_in),
   .deq(buffer_out),

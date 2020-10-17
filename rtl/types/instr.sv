@@ -1,5 +1,10 @@
-`ifndef __DECODED_INSTR_SV__
-`define __DECODED_INSTR_SV__
+`ifndef __INSTR_SV__
+`define __INSTR_SV__
+
+typedef struct packed {
+  addr pc;
+  instr raw;
+} fetched_instr;
 
 typedef enum {
   INSTR_R, INSTR_I, INSTR_S, INSTR_U, INSTR_J, INSTR_B
@@ -43,6 +48,8 @@ typedef enum {
 } instr_op;
 
 typedef struct packed {
+  addr pc;
+
   logic [31:0] imm;
   instr_op op;
 
@@ -57,4 +64,4 @@ typedef struct packed {
   // funct7 = imm[11:5]
 } decoded_instr;
 
-`endif // __DECODED_INSTR_SV__
+`endif // __INSTR_SV__

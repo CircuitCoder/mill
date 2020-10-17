@@ -1,8 +1,8 @@
 `ifndef __INSTR_FETCH_SV__
 `define __INSTR_FETCH_SV__
 
-`include "utils/mem_arbiter.sv"
 `include "types.sv"
+`include "utils/mem_arbiter.sv"
 
 module instr_fetch #(
   parameter int MAX_FETCHING_INSTR = 1
@@ -19,33 +19,42 @@ module instr_fetch #(
   input rst
 );
 
-localparam int INSTR_COUNTER = $clog2(MAX_FETCHING_INSTR+1);
-bit [INSTR_COUNTER-1:0] cnt;
-localparam [INSTR_COUNTER-1:0] BOUND = MAX_FETCHING_INSTR[0 +: INSTR_COUNTER];
+// Addr queue
+decoupled #(
+  .Data(addr)
+) addr_enq;
+decoupled #(
+  .Data(addr)
+) addr_deq;
+
+queue #(
+  .DEPTH(MAX_FETCHING_INSTR+1),
+  .FALLTHROUGH(1)
+) addr_queue (
+  .enq(addr_enq),
+  .deq(addr_deq),
+
+  .clk,
+  .rst
+);
 
 // TODO: flush logic
 wire _unused_flush = flush;
 
+assign addr_enq.valid = pc.valid && mem_req.ready;
+assign addr_enq.data = pc.data;
+
 assign mem_req.data = pc.data;
-assign mem_req.valid = pc.valid && cnt !== BOUND;
-assign pc.ready = mem_req.ready;
+assign mem_req.valid = pc.valid && addr_enq.ready;
 
-assign fetched.data = mem_resp.data;
-assign fetched.valid = mem_resp.valid;
+assign pc.ready = mem_req.ready && addr_enq.ready;
+
+assign fetched.data.raw = mem_resp.data;
+assign fetched.data.pc = addr_deq.data;
+assign fetched.valid = mem_resp.valid && addr_deq.valid;
+
 assign mem_resp.ready = fetched.ready;
-
-always_ff @(posedge clk or posedge rst) begin
-  if(rst) begin
-    cnt <= 0;
-  end else begin
-    if(mem_req.fire() && !mem_resp.fire()) begin
-      cnt <= cnt + 1;
-    end
-    if(!mem_req.fire() && mem_resp.fire()) begin
-      cnt <= cnt - 1;
-    end
-  end
-end
+assign addr_deq.ready = fetched.ready;
 
 endmodule : instr_fetch
 

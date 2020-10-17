@@ -19,7 +19,7 @@ module instr_decode #(
 
 // This stage is combinatory logic, hence no clocking signal is needed
 logic _unused_signals = &{ flush, clk, rst };
-instr from = fetched.data;
+instr from = fetched.data.raw;
 decoded_instr result;
 
 assign decoded.data = result;
@@ -128,6 +128,9 @@ assign rs_idx [1] = rs2;
 
 assign result.rs1_val = rs_val [0];
 assign result.rs2_val = rs_val [1];
+
+// Assign pc
+assign result.pc = fetched.data.pc;
 
 endmodule;
 

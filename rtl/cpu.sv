@@ -100,15 +100,16 @@ assign ex_fb_val = '0;
 
 // Stage registers
 decoupled #(
-  .Data(instr)
+  .Data(fetched_instr)
 ) if_fetched;
 
 decoupled #(
-  .Data(instr)
+  .Data(fetched_instr)
 ) id_fetched;
 
 queue #(
-  .Data(instr),
+  .Data(fetched_instr),
+  .DEPTH(2),
   .PIPE(1)
 ) if_id_queue (
   .enq(if_fetched),

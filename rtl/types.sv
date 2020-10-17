@@ -10,6 +10,6 @@ typedef logic [31:0] mtrans; // Memory transfer
 typedef logic [4:0] reg_idx;
 
 `include "types/decoupled.sv"
-`include "types/decoded_instr.sv"
+`include "types/instr.sv"
 
 `endif // __TYPES_SV__

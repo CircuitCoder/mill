@@ -8,7 +8,7 @@
 module queue #(
   parameter type Data = gpreg,
   parameter int DEPTH = 2,
-  parameter bit FALLTHROUGHT = 0,
+  parameter bit FALLTHROUGH = 0,
   parameter bit PIPE = 0
 ) (
   decoupled.in enq,
@@ -32,7 +32,7 @@ end else begin
   assign enq.ready = !full;
 end
 
-if(FALLTHROUGHT) begin
+if(FALLTHROUGH) begin
   assign deq.valid = !empty || enq.valid;
   assign deq.data = empty ? enq.data : store[head];
 end else begin
