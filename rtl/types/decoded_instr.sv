@@ -50,6 +50,9 @@ typedef struct packed {
   reg_idx rs2;
   reg_idx rd;
 
+  gpreg rs1_val;
+  gpreg rs2_val;
+
   logic [2:0] funct3;
   // funct7 = imm[11:5]
 } decoded_instr;

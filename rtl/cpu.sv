@@ -95,8 +95,10 @@ regfile #(
 
 assign rd_idx = '0;
 assign ex_fb_idx = '0;
+assign rd_val = '0;
+assign ex_fb_val = '0;
 
-// Stages
+// Stage registers
 decoupled #(
   .Data(instr)
 ) if_fetched;
@@ -119,6 +121,8 @@ decoupled #(
   .Data(decoded_instr)
 ) id_ex_decoded;
 
+// Stages
+
 instr_fetch #(
   .MAX_FETCHING_INSTR(1)
 ) if_inst (
@@ -137,6 +141,9 @@ instr_decode #(
 ) id_inst (
   .fetched(id_fetched),
   .decoded(id_ex_decoded),
+
+  .rs_idx,
+  .rs_val,
 
   .flush('0),
   .clk, .rst

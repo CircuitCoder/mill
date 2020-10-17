@@ -7,6 +7,9 @@ module instr_decode #(
 ) (
   decoupled.in fetched, // instr
   decoupled.out decoded, // decoded_instr
+
+  output reg_idx rs_idx [2], // To regfile
+  input gpreg rs_val [2], // From regfile
  
   input flush,
 
@@ -94,8 +97,13 @@ assign result.op = result_op;
 logic has_rs1 = result_fmt != INSTR_U && result_fmt != INSTR_J;
 logic has_rs2 = result_fmt != INSTR_U && result_fmt != INSTR_J && result_fmt != INSTR_I;
 logic has_rd = result_fmt != INSTR_S && result_fmt != INSTR_B;
-assign result.rs1 = has_rs1 ? from[19:15] : '0;
-assign result.rs2 = has_rs2 ? from[24:20] : '0;
+
+// Prevents circular warning result -> regfile -> result
+reg_idx rs1 = has_rs1 ? from[19:15] : '0;
+reg_idx rs2 = has_rs2 ? from[24:20] : '0;
+
+assign result.rs1 = rs1;
+assign result.rs2 = rs2;
 assign result.rd = has_rd ? from[11:7] : '0;
 
 // Decode imm
@@ -113,6 +121,13 @@ end
 
 // Decode funct3
 assign result.funct3 = from[14:12];
+
+// Read rs
+assign rs_idx [0] = rs1;
+assign rs_idx [1] = rs2;
+
+assign result.rs1_val = rs_val [0];
+assign result.rs2_val = rs_val [1];
 
 endmodule;
 
