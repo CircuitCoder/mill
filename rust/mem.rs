@@ -23,10 +23,11 @@ impl Mem {
             buffer.push(0);
         }
 
-        let tot_cnt = buffer.len() / 4;
+        let tot_len = buffer.len();
+
         let mut cursor = std::io::Cursor::new(buffer);
 
-        for idx in offset..(offset + tot_cnt as u64) {
+        for idx in (offset..(offset + tot_len as u64)).step_by(4) {
             let readout = cursor.read_u32::<LittleEndian>()?;
             self.mem.insert(idx, readout);
         }
