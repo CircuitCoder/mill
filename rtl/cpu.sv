@@ -49,6 +49,7 @@ decoupled #(
   .Data(mtrans)
 ) mem_sub_resp [2];
 
+// TODO: make data mem request the privileged one
 mem_arbiter #(
   .CNT(2),
   .QUEUE_DEPTH(2)
