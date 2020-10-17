@@ -44,7 +44,10 @@ wire _unused_flush = flush;
 assign addr_enq.valid = pc.valid && mem_req.ready;
 assign addr_enq.data = pc.data;
 
-assign mem_req.data = pc.data;
+assign mem_req.data.a = pc.data;
+assign mem_req.data.we = '0;
+assign mem_req.data.be = 'X;
+assign mem_req.data.d = 'X;
 assign mem_req.valid = pc.valid && addr_enq.ready;
 
 assign pc.ready = mem_req.ready && addr_enq.ready;

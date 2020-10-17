@@ -7,6 +7,9 @@ module top #(
 ) (
   // Memory request
   output var [ADDR_WIDTH-1:0] mem_req_addr,
+  output var mem_req_we,
+  output var [DATA_WIDTH-1:0] mem_req_data,
+  output var [(DATA_WIDTH/8)-1:0] mem_req_be,
   output var mem_req_valid,
   input var mem_req_ready,
 
@@ -23,14 +26,18 @@ module top #(
 );
 
 decoupled #(
-  .Data(bit[ADDR_WIDTH-1:0])
+  .Data(mreq)
 ) mem_req;
 
 decoupled #(
-  .Data(bit[DATA_WIDTH-1:0])
+  .Data(mtrans)
 ) mem_resp;
 
-assign mem_req_addr = mem_req.data;
+assign mem_req_addr = mem_req.data.a;
+assign mem_req_we = mem_req.data.we;
+assign mem_req_be = mem_req.data.be;
+assign mem_req_data = mem_req.data.d;
+
 assign mem_req_valid = mem_req.valid;
 assign mem_req.ready = mem_req_ready;
 

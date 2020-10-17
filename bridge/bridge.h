@@ -8,10 +8,12 @@
 #define __BRIDGE_H__
 
 namespace mill::bridge {
+  struct MemReqPacket;
+
   class MemReq {
   public:
     virtual ~MemReq() {};
-    virtual bool read(uint64_t &addr) = 0;
+    virtual bool read(MemReqPacket &pack) = 0;
     virtual void no_read() = 0;
   };
 
@@ -43,7 +45,7 @@ namespace mill::bridge {
   std::unique_ptr<MemReq> mem_req(std::unique_ptr<CPU> &cpu);
   std::unique_ptr<MemResp> mem_resp(std::unique_ptr<CPU> &cpu);
 
-  bool read(std::unique_ptr<MemReq> &req, uint64_t &addr);
+  bool read(std::unique_ptr<MemReq> &req, MemReqPacket &pack);
   void no_read(std::unique_ptr<MemReq> &req);
 
   bool write(std::unique_ptr<MemResp> &resp, const rust::Vec<uint64_t> &packed_data);

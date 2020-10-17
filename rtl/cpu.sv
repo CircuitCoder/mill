@@ -43,7 +43,7 @@ end
 
 /* Memory interface */
 decoupled #(
-  .Data(addr)
+  .Data(mreq)
 ) mem_sub_req [2];
 
 decoupled #(
@@ -212,6 +212,7 @@ assign rd_val = commit.data.rd_val;
   ints
 };
 
+assign mem_sub_req[1].data = 'X;
 assign mem_sub_req[1].valid = '0;
 assign mem_sub_resp[1].ready = '0;
 

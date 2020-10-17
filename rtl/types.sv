@@ -9,6 +9,13 @@ typedef logic [31:0] addr; // Address
 typedef logic [31:0] mtrans; // Memory transfer
 typedef logic [4:0] reg_idx;
 
+typedef struct packed {
+  addr a;
+  logic we;
+  logic [3:0] be;
+  mtrans d;
+} mreq;
+
 `include "types/decoupled.sv"
 `include "types/instr.sv"
 `include "types/exec_result.sv"

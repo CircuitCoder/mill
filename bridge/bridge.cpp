@@ -95,10 +95,15 @@ namespace mill::bridge {
       public:
         MemReqImpl(CPUImpl *_parent) : parent(_parent) {}
 
-        virtual bool read(uint64_t &result) override {
+        virtual bool read(MemReqPacket &result) override {
           parent->backend.mem_req_ready = true;
           parent->backend.eval();
-          result = parent->backend.mem_req_addr;
+
+          result.addr = parent->backend.mem_req_addr;
+          result.we = parent->backend.mem_req_we;
+          result.be = parent->backend.mem_req_be;
+          result.data = parent->backend.mem_req_data;
+
           return parent->backend.mem_req_valid != 0;
         }
 
@@ -172,8 +177,8 @@ namespace mill::bridge {
     return std::unique_ptr<MemResp>(cpu->mem_resp());
   }
 
-  bool read(std::unique_ptr<MemReq> &req, uint64_t &addr) {
-    return req->read(addr);
+  bool read(std::unique_ptr<MemReq> &req, MemReqPacket &pack) {
+    return req->read(pack);
   }
   void no_read(std::unique_ptr<MemReq> &req) {
     req->no_read();

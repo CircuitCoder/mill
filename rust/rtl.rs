@@ -3,8 +3,9 @@ mod ffi {
     // TODO: handle memory write
     struct MemReqPacket {
         addr: u64,
-        is_write: bool,
-        data: u32,
+        we: bool,
+        be: u8,
+        data: u32, // TODO: return as CxxVec or CxxString
     }
 
     extern "C" {
@@ -23,7 +24,7 @@ mod ffi {
         pub fn mem_req(cpu: &mut UniquePtr<CPU>) -> UniquePtr<MemReq>;
         pub fn mem_resp(cpu: &mut UniquePtr<CPU>) -> UniquePtr<MemResp>;
 
-        pub fn read(req: &mut UniquePtr<MemReq>, addr: &mut u64) -> bool;
+        pub fn read(req: &mut UniquePtr<MemReq>, addr: &mut MemReqPacket) -> bool;
         pub fn no_read(req: &mut UniquePtr<MemReq>);
 
         pub fn write(resp: &mut UniquePtr<MemResp>, packed_data: &Vec<u64>) -> bool;
@@ -70,35 +71,53 @@ impl CPU {
 pub struct MemInterface {
     req: UniquePtr<ffi::MemReq>,
     resp: UniquePtr<ffi::MemResp>,
-    pending: Option<u64>,
+    pending: Option<Vec<u64>>,
 }
 
 impl MemInterface {
     pub fn handle_single_tick(&mut self, mem: &mut Mem) {
-        if let Some(pending) = self.pending {
+        if let Some(ref pending) = self.pending {
             // Process pending request from the previous cycle
             ffi::no_read(&mut self.req);
-            let data = mem.mem.get(&pending).cloned().unwrap_or(0);
-            let data_pack = vec![data as u64];
-            let resp = ffi::write(&mut self.resp, &data_pack);
+            let resp = ffi::write(&mut self.resp, pending);
             if resp {
                 self.pending = None;
             }
         } else {
-            let mut addr: u64 = 0;
-            let has_req = ffi::read(&mut self.req, &mut addr);
+            let mut pack = ffi::MemReqPacket {
+                addr: 0, be: 0, we: false, data: 0,
+            };
+
+            let has_req = ffi::read(&mut self.req, &mut pack);
 
             if !has_req {
                 ffi::no_write(&mut self.resp);
                 return;
             }
 
-            let data = mem.mem.get(&addr).cloned().unwrap_or(0);
+            let data = mem.mem.get(&pack.addr).cloned().unwrap_or(0);
+
+            // Write
+            if pack.we {
+                let mut buffer = data.to_le_bytes();
+                let writing = pack.data.to_le_bytes();
+                for i in 0..4 {
+                    if (pack.be & (1<<i)) != 0 {
+                        buffer[i] = writing[i];
+                    }
+                }
+
+                let flatten = u32::from_le_bytes(buffer);
+                if flatten != data {
+                    mem.mem.insert(pack.addr, flatten);
+                }
+            }
+
             let data_pack = vec![data as u64];
             let resp = ffi::write(&mut self.resp, &data_pack);
 
             if !resp {
-                self.pending = Some(addr);
+                self.pending = Some(data_pack);
             }
         }
     }

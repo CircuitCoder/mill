@@ -45,10 +45,10 @@ queue #(
 
 // Request arbiter l [CNT]ogic
 wire master_valid [CNT];
-wire [ADDR_WIDTH-1:0] master_addr [CNT];
+wire mreq master_req_data [CNT];
 for(genvar i = 0; i < CNT; i = i+1) begin
   assign master_valid[i] = master_req[i].valid;
-  assign master_addr[i] = master_req[i].data;
+  assign master_req_data[i] = master_req[i].data;
 end
 
 var master_idx sel;
@@ -60,7 +60,7 @@ always_comb begin
     master_idx casted = master_idx '(i);
     if(master_valid[casted]) begin
       sel = casted;
-      slave_req.data = master_addr[casted];
+      slave_req.data = master_req_data[casted];
     end
     has_req |= master_valid[casted];
   end
