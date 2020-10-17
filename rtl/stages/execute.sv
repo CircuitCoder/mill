@@ -5,11 +5,15 @@
 
 `include "exec/alu.sv"
 `include "exec/misc.sv"
+`include "exec/mem.sv"
 
 module execute #(
 ) (
   decoupled.in decoded,
   decoupled.out result, // Unblockable
+
+  decoupled.out mem_req,
+  decoupled.in mem_resp,
 
   input flush,
 
@@ -23,12 +27,15 @@ end
 
 decoupled #(.Data(decoded_instr)) misc_input;
 decoupled #(.Data(decoded_instr)) alu_input;
+decoupled #(.Data(decoded_instr)) mem_input;
 
 exec_result misc_result;
 exec_result alu_result;
+exec_result mem_result;
 
 assign misc_input.data = decoded.data;
 assign alu_input.data = decoded.data;
+assign mem_input.data = decoded.data;
 
 /* Misc (LUI/JALR/Invalid) */
 misc #() misc_inst (
@@ -45,14 +52,27 @@ alu #() alu_inst (
 
   .flush, .clk, .rst
 );
+
+/* Mem */
+mem #() mem_inst (
+  .decoded(mem_input),
+  .result(mem_result),
+
+  .mem_req, .mem_resp,
+
+  .flush, .clk, .rst
+);
+
 // TODO: PCRel (AUIPC/B/JAL)
-// TODO: Mem
+
+// TODO: handle MISC-MEM in misc
 
 /* Arbiter */
 
 always_comb begin
   misc_input.valid = '0;
   alu_input.valid = '0;
+  mem_input.valid = '0;
   result.valid = '0;
 
   unique case(decoded.data.op)
@@ -67,6 +87,12 @@ always_comb begin
       decoded.ready = alu_input.ready;
       result.valid = alu_input.ready;
       result.data = alu_result;
+    end
+    INSTR_LOAD, INSTR_STORE: begin
+      mem_input.valid = decoded.valid;
+      decoded.ready = mem_input.ready;
+      result.valid = mem_input.ready;
+      result.data = mem_result;
     end
   endcase
 end

@@ -57,7 +57,7 @@ always_comb begin
     0'b000: // ADD/SUB
       computation = funct7_action_bit ? operand1 - operand2 : operand1 + operand2;
     0'b001: // SLL
-      computation = operand1 << operand2[4:0];
+      computation = operand1 <<< operand2[4:0];
     0'b010: // SLT
       computation = (signed'(operand1) < signed'(operand2)) ? '1 : '0;
     0'b011: // SLTU

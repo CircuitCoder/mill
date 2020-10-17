@@ -165,8 +165,8 @@ instr_fetch #(
 ) if_inst (
   .pc(if_pc),
   .fetched(if_fetched),
-  .mem_req(mem_sub_req[0]),
-  .mem_resp(mem_sub_resp[0]),
+  .mem_req(mem_sub_req[1]),
+  .mem_resp(mem_sub_resp[1]),
 
   .flush('0),
   
@@ -191,6 +191,9 @@ execute #(
   .decoded(ex_decoded),
   .result(ex_result),
 
+  .mem_req(mem_sub_req[0]),
+  .mem_resp(mem_sub_resp[0]),
+
   .flush('0),
   .clk, .rst
 );
@@ -206,14 +209,7 @@ assign rd_val = commit.data.rd_val;
 (* keep = "soft" *) wire _unused = &{
   ex_result.data,
   ex_result.valid,
-  mem_sub_req[1].ready,
-  mem_sub_resp[1].valid,
-  mem_sub_resp[1].data,
   ints
 };
-
-assign mem_sub_req[1].data = 'X;
-assign mem_sub_req[1].valid = '0;
-assign mem_sub_resp[1].ready = '0;
 
 endmodule : cpu
