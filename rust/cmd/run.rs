@@ -57,10 +57,7 @@ impl RunArgs {
         }
 
         log::debug!("Creating CPU...");
-        let mut cpu = rtl::CPU::new(
-            &self.extra,
-            &self.trace,
-        );
+        let mut cpu = rtl::CPU::new(&self.extra, &self.trace);
         cpu.set_rst(true);
 
         log::debug!("Creating MemInterface...");

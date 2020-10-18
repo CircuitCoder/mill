@@ -58,7 +58,7 @@ impl CPU {
     pub fn set_rst(&mut self, rst: bool) {
         ffi::set_rst(&mut self.0, rst);
     }
-    
+
     pub fn mem(&mut self) -> MemInterface {
         MemInterface {
             req: ffi::mem_req(&mut self.0),
@@ -85,7 +85,10 @@ impl MemInterface {
             }
         } else {
             let mut pack = ffi::MemReqPacket {
-                addr: 0, be: 0, we: false, data: 0,
+                addr: 0,
+                be: 0,
+                we: false,
+                data: 0,
             };
 
             let has_req = ffi::read(&mut self.req, &mut pack);
@@ -102,7 +105,7 @@ impl MemInterface {
                 let mut buffer = data.to_le_bytes();
                 let writing = pack.data.to_le_bytes();
                 for i in 0..4 {
-                    if (pack.be & (1<<i)) != 0 {
+                    if (pack.be & (1 << i)) != 0 {
                         buffer[i] = writing[i];
                     }
                 }

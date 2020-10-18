@@ -7,7 +7,8 @@ use super::SharedArgs;
 use structopt::StructOpt;
 
 fn run_internal<I>(it: I, shared: SharedArgs) -> Result<(), Error>
-  where I: IntoIterator<Item=PathBuf>
+where
+    I: IntoIterator<Item = PathBuf>,
 {
     for path in it {
         log::debug!("Running file: {}", path.display());
@@ -20,7 +21,7 @@ fn run_internal<I>(it: I, shared: SharedArgs) -> Result<(), Error>
 pub struct TestArgs {
     /// A list file as bare binary executable. If not present, mill will try to read from stdin and use that as the file list (one path per line)
     #[structopt(short, long)]
-    files: Option<Vec<PathBuf>>
+    files: Option<Vec<PathBuf>>,
 }
 
 impl TestArgs {

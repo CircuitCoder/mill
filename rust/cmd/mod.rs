@@ -8,10 +8,7 @@ use self::run::RunArgs;
 use self::test::TestArgs;
 
 #[derive(StructOpt, Debug)]
-#[structopt(
-    author,
-    about = "The mill driver",
-)]
+#[structopt(author, about = "The mill driver")]
 pub struct Args {
     #[structopt(flatten)]
     shared: SharedArgs,
@@ -40,9 +37,7 @@ pub struct SharedArgs {
 }
 
 #[derive(StructOpt, Debug)]
-#[structopt(
-    about = "Subcommand",
-)]
+#[structopt(about = "Subcommand")]
 enum Command {
     /// Run CPU Simulation
     Run(RunArgs),

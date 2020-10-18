@@ -1,8 +1,8 @@
+use anyhow::{anyhow, Error};
+use byteorder::LittleEndian;
+use byteorder::ReadBytesExt;
 use std::collections::HashMap;
 use std::io::Read;
-use byteorder::ReadBytesExt;
-use byteorder::LittleEndian;
-use anyhow::{anyhow, Error};
 
 #[derive(Default)]
 pub struct Mem {
