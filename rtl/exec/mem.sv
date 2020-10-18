@@ -59,6 +59,7 @@ always_comb begin
   unique case(decoded.data.op)
     INSTR_STORE: mem_req.data.we = '1;
     INSTR_LOAD: mem_req.data.we = '0;
+    default: $error("Unexpected instruction op");
   endcase
 end
 
@@ -79,8 +80,7 @@ mtrans shifted = mem_resp.data >>> shift;
 gpreg readout;
 
 always_comb begin
-  /* verilator lint_off CASEINCOMPLETE */
-  unique0 case(decoded.data.funct3)
+  unique case(decoded.data.funct3)
     // LBx
     3'b000: readout = 32'(signed'(shifted[7:0]));
     3'b100: readout = { 24'b0, shifted[7:0] } ;
@@ -90,8 +90,8 @@ always_comb begin
     3'b101: readout = { 16'b0, shifted[15:0] } ;
 
     3'b010: readout = shifted;
+    default: $error("Unexpected funct3");
   endcase
-  /* verilator lint_on CASEINCOMPLETE */
 end
 
 assign result.rd_idx = decoded.data.rd;

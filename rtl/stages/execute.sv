@@ -111,6 +111,7 @@ always_comb begin
       result.valid = pcrel_input.ready && decoded.valid;
       result.data = pcrel_result;
     end
+    default: $error("Unexpected instruction op");
   endcase
 end
 

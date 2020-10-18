@@ -1,7 +1,7 @@
 `ifndef __EXEC_RESULT_SV__
 `define __EXEC_RESULT_SV__
 
-`include "types.sv";
+`include "types.sv"
 
 typedef struct packed {
   reg_idx rd_idx;

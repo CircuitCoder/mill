@@ -47,6 +47,7 @@ always_comb begin
           inval_funct7 = funct7 != 7'b0000000;
       endcase
     end
+    default: $error("Unexpected instruction op");
   endcase
 end
 

@@ -30,6 +30,7 @@ always_comb begin
     INSTR_INVAL: begin
       // TODO: Exception
     end
+    default: $error("Unexpected instruction op");
   endcase
 end
 

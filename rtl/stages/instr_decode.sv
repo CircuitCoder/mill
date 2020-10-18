@@ -118,6 +118,7 @@ always_comb begin // TODO: test does length mismatch triggers a warning?
     INSTR_B: result.imm = { {19{sign_bit}}, from[31], from[7], from[30:25], from[11:8], 1'b0 };
     INSTR_U: result.imm = { from[31:12], 12'b0 };
     INSTR_J: result.imm = { {11{sign_bit}}, from[31], from[19:12], from[20], from[30:21], 1'b0 };
+    default: $error("Unexpected instr format");
   endcase
 end
 

@@ -26,7 +26,7 @@ interface decoupled #(
     import fire
   );
 
-  function bit fire();
+  function automatic bit fire();
     fire = valid && ready;
   endfunction
 endinterface : decoupled

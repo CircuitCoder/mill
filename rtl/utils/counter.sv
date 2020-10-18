@@ -12,10 +12,10 @@ module counter #(
   input var rst
 );
 
-if(BOUND === 1) begin
+if(BOUND === 1) begin : STATIC_CNT
   logic _unused = &{ tick, clk, rst };
   assign current = '0;
-end else begin
+end else begin : CNT
   parameter WIDTH = $clog2(BOUND);
   logic [WIDTH-1:0] cnt;
   assign current = cnt;

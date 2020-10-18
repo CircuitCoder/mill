@@ -58,6 +58,7 @@ always_comb begin
       result.rd_val = 'X;
       inval_instr = inval_br_funct3;
     end
+    default: $error("Unexpected instruction op");
   endcase
 end
 

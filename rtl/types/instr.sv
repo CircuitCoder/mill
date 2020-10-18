@@ -6,11 +6,11 @@ typedef struct packed {
   instr raw;
 } fetched_instr;
 
-typedef enum {
+typedef enum logic [2:0] {
   INSTR_R, INSTR_I, INSTR_S, INSTR_U, INSTR_J, INSTR_B
 } instr_fmt;
 
-typedef enum {
+typedef enum logic [4:0]{
   /* 00xxx */
   INSTR_LOAD,
   // LOAD_FP,
