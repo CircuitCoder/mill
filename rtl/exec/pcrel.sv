@@ -13,6 +13,8 @@ module pcrel #(
   input rst
 );
 
+assign decoded.ready = '1;
+
 addr rel;
 assign rel = decoded.data.pc + decoded.data.imm;
 

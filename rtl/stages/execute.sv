@@ -90,25 +90,25 @@ always_comb begin
     INSTR_INVAL, INSTR_JALR, INSTR_LUI: begin
       misc_input.valid = decoded.valid;
       decoded.ready = misc_input.ready;
-      result.valid = misc_input.ready;
+      result.valid = misc_input.ready && decoded.valid;
       result.data = misc_result;
     end
     INSTR_OP, INSTR_OP_IMM: begin
       alu_input.valid = decoded.valid;
       decoded.ready = alu_input.ready;
-      result.valid = alu_input.ready;
+      result.valid = alu_input.ready && decoded.valid;
       result.data = alu_result;
     end
     INSTR_LOAD, INSTR_STORE: begin
       mem_input.valid = decoded.valid;
       decoded.ready = mem_input.ready;
-      result.valid = mem_input.ready;
+      result.valid = mem_input.ready && decoded.valid;
       result.data = mem_result;
     end
     INSTR_BRANCH, INSTR_JAL, INSTR_AUIPC: begin
       pcrel_input.valid = decoded.valid;
       decoded.ready = pcrel_input.ready;
-      result.valid = pcrel_input.ready;
+      result.valid = pcrel_input.ready && decoded.valid;
       result.data = pcrel_result;
     end
   endcase
