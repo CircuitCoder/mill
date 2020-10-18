@@ -1,9 +1,11 @@
 pub mod run;
+pub mod test;
 
 use anyhow::Error;
 use structopt::StructOpt;
 
 use self::run::RunArgs;
+use self::test::TestArgs;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -39,16 +41,21 @@ pub struct SharedArgs {
 
 #[derive(StructOpt, Debug)]
 #[structopt(
-    about = "Run CPU simulation",
+    about = "Subcommand",
 )]
 enum Command {
-    Run(RunArgs)
+    /// Run CPU Simulation
+    Run(RunArgs),
+
+    /// Run Test
+    Test(TestArgs),
 }
 
 impl Command {
     pub fn run(self, shared: SharedArgs) -> Result<(), Error> {
         match self {
             Self::Run(a) => a.run(shared),
+            Self::Test(a) => a.run(shared),
         }
     }
 }
