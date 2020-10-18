@@ -21,15 +21,16 @@ module cpu #(
   input var rst
 );
 
-// PC logic
-reg [31:0] pc;
-wire [31:0] npc;
+/* PC logic */
+gpreg pc;
+
+logic br_valid;
+gpreg br_target;
+
 decoupled #(
   .Data(addr)
 ) if_pc;
 
-// By defualt, npc = pc + 4 for RV32I impls
-assign npc = pc + 4;
 assign if_pc.data = pc;
 assign if_pc.valid = '1;
 
@@ -37,7 +38,9 @@ always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
     pc <= BOOT_VEC;
   end else begin
-    if(if_pc.fire()) pc <= npc;
+    if(br_valid) pc <= br_target;
+    // By defualt, npc = pc + 4 for RV32I impls
+    else if(if_pc.fire()) pc <= pc + 4;
   end
 end
 
@@ -112,6 +115,8 @@ queue #(
   .enq(if_fetched),
   .deq(id_fetched),
 
+  .flush(br_valid),
+
   .clk, .rst
 );
 
@@ -131,6 +136,8 @@ queue #(
   .enq(id_decoded),
   .deq(ex_decoded),
 
+  .flush(br_valid),
+
   .clk, .rst
 );
 
@@ -142,6 +149,7 @@ decoupled #(
   .Data(exec_result)
 ) commit;
 
+// Currently we are branching from ex, hence we don't have to flush the ex_commit_queue and ex itself
 queue #(
   .Data(exec_result),
   .DEPTH(2),
@@ -149,6 +157,8 @@ queue #(
 ) ex_commit_queue (
   .enq(ex_result),
   .deq(commit),
+
+  .flush('0),
 
   .clk, .rst
 );
@@ -158,17 +168,19 @@ queue #(
 assign ex_fb_idx = ex_result.data.rd_idx;
 assign ex_fb_val = ex_result.data.rd_val;
 
+assign br_valid = ex_result.valid && ex_result.data.br_valid;
+assign br_target = ex_result.data.br_target;
+
 /* Stages */
 
 instr_fetch #(
-  .MAX_FETCHING_INSTR(1)
 ) if_inst (
   .pc(if_pc),
   .fetched(if_fetched),
   .mem_req(mem_sub_req[1]),
   .mem_resp(mem_sub_resp[1]),
 
-  .flush('0),
+  .flush(br_valid),
   
   .clk,
   .rst
@@ -182,7 +194,7 @@ instr_decode #(
   .rs_idx,
   .rs_val,
 
-  .flush('0),
+  .flush(br_valid),
   .clk, .rst
 );
 
@@ -199,12 +211,9 @@ execute #(
 );
 
 /* Commit */
-// FIXME: handles branch
 assign commit.ready = '1;
 assign rd_idx = commit.valid ? commit.data.rd_idx : '0;
 assign rd_val = commit.data.rd_val;
-
-// TODO: branch
 
 // Void all unused signals
 (* keep = "soft" *) wire _unused = &{

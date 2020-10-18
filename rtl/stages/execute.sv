@@ -5,6 +5,7 @@
 
 `include "exec/alu.sv"
 `include "exec/misc.sv"
+`include "exec/pcrel.sv"
 `include "exec/mem.sv"
 
 module execute #(

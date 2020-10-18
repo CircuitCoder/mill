@@ -39,6 +39,8 @@ queue #(
   .enq(buffer_in),
   .deq(buffer_out),
 
+  .flush('0),
+
   .clk,
   .rst
 );

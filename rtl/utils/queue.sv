@@ -4,7 +4,6 @@
 `include "types.sv";
 
 // TODO: 0-depth queue
-// TODO: flush
 module queue #(
   parameter type Data = gpreg,
   parameter int DEPTH = 2,
@@ -13,6 +12,8 @@ module queue #(
 ) (
   decoupled.in enq,
   decoupled.out deq,
+
+  input flush,
 
   input clk,
   input rst
@@ -42,6 +43,9 @@ end
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
+    head <= 0;
+    tail <= 0;
+  end else if(flush) begin
     head <= 0;
     tail <= 0;
   end else begin

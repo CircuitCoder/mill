@@ -3,7 +3,7 @@
 
 `include "types.sv"
 
-module misc #(
+module pcrel #(
 ) (
   decoupled.in decoded,
   output exec_result result,
@@ -60,7 +60,10 @@ always_comb begin
 end
 
 // TODO: inval instr
-assign _unused_inval = inval_instr;
+logic _unused_inval = inval_instr;
+
+// PCRel is fully combinatory
+logic _unused = &{ clk, rst, flush };
 
 endmodule
 

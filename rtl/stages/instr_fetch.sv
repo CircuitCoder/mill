@@ -20,44 +20,33 @@ module instr_fetch #(
 );
 
 // Addr queue
-decoupled #(
-  .Data(addr)
-) addr_enq;
-decoupled #(
-  .Data(addr)
-) addr_deq;
-
-queue #(
-  .DEPTH(MAX_FETCHING_INSTR+1),
-  .FALLTHROUGH(1)
-) addr_queue (
-  .enq(addr_enq),
-  .deq(addr_deq),
-
-  .clk,
-  .rst
-);
-
-// TODO: flush logic
-wire _unused_flush = flush;
-
-assign addr_enq.valid = pc.valid && mem_req.ready;
-assign addr_enq.data = pc.data;
+gpreg sent_addr;
+logic sent;
 
 assign mem_req.data.a = pc.data;
 assign mem_req.data.we = '0;
 assign mem_req.data.be = 'X;
 assign mem_req.data.d = 'X;
-assign mem_req.valid = pc.valid && addr_enq.ready;
-
-assign pc.ready = mem_req.ready && addr_enq.ready;
+assign mem_req.valid = pc.valid && !sent && !flush;
+assign pc.ready = mem_req.ready;
 
 assign fetched.data.raw = mem_resp.data;
-assign fetched.data.pc = addr_deq.data;
-assign fetched.valid = mem_resp.valid && addr_deq.valid;
-
+assign fetched.data.pc = sent ? sent_addr : pc.data;
+assign fetched.valid = mem_resp.valid;
 assign mem_resp.ready = fetched.ready;
-assign addr_deq.ready = fetched.ready;
+
+always_ff @(posedge clk or posedge rst) begin
+  if(rst) begin
+    sent <= '0;
+  end else begin
+    if(mem_resp.fire()) begin
+      sent <= '0;
+    end else if(mem_req.fire()) begin
+      sent <= '1;
+      sent_addr <= pc.data;
+    end
+  end
+end
 
 endmodule : instr_fetch
 
