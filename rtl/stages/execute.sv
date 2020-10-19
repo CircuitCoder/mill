@@ -26,10 +26,10 @@ always begin
   assert(result.ready);
 end
 
-decoupled #(.Data(decoded_instr)) misc_input;
-decoupled #(.Data(decoded_instr)) alu_input;
-decoupled #(.Data(decoded_instr)) mem_input;
-decoupled #(.Data(decoded_instr)) pcrel_input;
+decoupled #(.Data(decoded_instr)) misc_input ();
+decoupled #(.Data(decoded_instr)) alu_input ();
+decoupled #(.Data(decoded_instr)) mem_input ();
+decoupled #(.Data(decoded_instr)) pcrel_input ();
 
 exec_result misc_result;
 exec_result alu_result;

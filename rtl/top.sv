@@ -27,11 +27,11 @@ module top #(
 
 decoupled #(
   .Data(mreq)
-) mem_req;
+) mem_req ();
 
 decoupled #(
   .Data(mtrans)
-) mem_resp;
+) mem_resp ();
 
 assign mem_req_addr = mem_req.data.a;
 assign mem_req_we = mem_req.data.we;

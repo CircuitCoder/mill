@@ -29,7 +29,7 @@ typedef bit [MASTER_IDX_WIDTH-1:0] master_idx;
 
 decoupled #(
   .Data(master_idx)
-) buffer_in, buffer_out;
+) buffer_in (), buffer_out ();
 
 queue #(
   .Data(master_idx),

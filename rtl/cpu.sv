@@ -29,7 +29,7 @@ gpreg br_target;
 
 decoupled #(
   .Data(addr)
-) if_pc;
+) if_pc ();
 
 assign if_pc.data = pc;
 assign if_pc.valid = '1;
@@ -47,11 +47,11 @@ end
 /* Memory interface */
 decoupled #(
   .Data(mreq)
-) mem_sub_req [2];
+) mem_sub_req [2] ();
 
 decoupled #(
   .Data(mtrans)
-) mem_sub_resp [2];
+) mem_sub_resp [2] ();
 
 // TODO: make data mem request the privileged one
 mem_arbiter #(
@@ -101,11 +101,11 @@ regfile #(
 /* Stage registers */
 decoupled #(
   .Data(fetched_instr)
-) if_fetched;
+) if_fetched ();
 
 decoupled #(
   .Data(fetched_instr)
-) id_fetched;
+) id_fetched ();
 
 queue #(
   .Data(fetched_instr),
@@ -122,11 +122,11 @@ queue #(
 
 decoupled #(
   .Data(decoded_instr)
-) id_decoded;
+) id_decoded ();
 
 decoupled #(
   .Data(decoded_instr)
-) ex_decoded;
+) ex_decoded ();
 
 queue #(
   .Data(decoded_instr),
@@ -143,11 +143,11 @@ queue #(
 
 decoupled #(
   .Data(exec_result)
-) ex_result;
+) ex_result ();
 
 decoupled #(
   .Data(exec_result)
-) commit;
+) commit ();
 
 // Currently we are branching from ex, hence we don't have to flush the ex_commit_queue and ex itself
 queue #(
