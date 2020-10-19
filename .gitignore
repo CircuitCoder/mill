@@ -349,3 +349,5 @@ bridge/build
 *.fst
 *.bin
 data
+*.gtkw
+*.wcfg

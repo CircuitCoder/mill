@@ -75,7 +75,8 @@ assign mem_req.valid = decoded.valid && !request_sent;
 assign mem_resp.ready = '1;
 assign decoded.ready = mem_resp.valid;
 
-mtrans shifted = mem_resp.data >>> shift;
+mtrans shifted;
+assign shifted = mem_resp.data >>> shift;
 gpreg readout;
 
 always_comb begin

@@ -102,17 +102,23 @@ impl MemInterface {
 
             // Write
             if pack.we {
-                let mut buffer = data.to_le_bytes();
-                let writing = pack.data.to_le_bytes();
-                for i in 0..4 {
-                    if (pack.be & (1 << i)) != 0 {
-                        buffer[i] = writing[i];
+                if pack.addr == 0x20000000u64 {
+                    // tohost
+                    log::info!("tohost: {}", pack.data);
+                } else {
+                    log::debug!("writing: 0x{:x} <- 0x{:x} / 0b{:b}", pack.addr, pack.data, pack.be);
+                    let mut buffer = data.to_le_bytes();
+                    let writing = pack.data.to_le_bytes();
+                    for i in 0..4 {
+                        if (pack.be & (1 << i)) != 0 {
+                            buffer[i] = writing[i];
+                        }
                     }
-                }
 
-                let flatten = u32::from_le_bytes(buffer);
-                if flatten != data {
-                    mem.mem.insert(pack.addr, flatten);
+                    let flatten = u32::from_le_bytes(buffer);
+                    if flatten != data {
+                        mem.mem.insert(pack.addr, flatten);
+                    }
                 }
             }
 
