@@ -1,7 +1,7 @@
 `ifndef __QUEUE_SV__
 `define __QUEUE_SV__
 
-`include "types.sv";
+`include "types.sv"
 
 // TODO: 0-depth queue
 module queue #(

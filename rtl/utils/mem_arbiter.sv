@@ -7,7 +7,7 @@
 `ifndef __MEM_ARBITER_H__
 `define __MEM_ARBITER_H__
 
-`include "utils/queue.sv";
+`include "utils/queue.sv"
 
 module mem_arbiter #(
   parameter CNT = 2,
