@@ -2,7 +2,7 @@
 `define __INSTR_FETCH_SV__
 
 `include "types.sv"
-`include "utils/mem_arbiter.sv"
+`include "components/mem_arbiter.sv"
 
 module instr_fetch #(
   parameter int MAX_FETCHING_INSTR = 1
@@ -29,6 +29,8 @@ assign mem_req.data.be = 'X;
 assign mem_req.data.d = 'X;
 assign mem_req.valid = pc.valid && !sent && !flush;
 assign pc.ready = mem_req.ready;
+
+// TODO: flush logic
 
 assign fetched.data.raw = mem_resp.data;
 assign fetched.data.pc = sent ? sent_addr : pc.data;

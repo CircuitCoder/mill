@@ -12,10 +12,21 @@ theme:
 
 nav:
   - 主页: index.md
+  - 示例 CPU 设计:
+    - 总览: arch/overview.md
+    - 实现细节: arch/impl.md
+    - 扩展开发指南: arch/ext.md
   - 测试框架:
+    - Recipes: usage/recipes.md
     - GTKWave / FST: usage/gtkwave.md
   - 开发日志:
     - 主页: timeline/index.md
     - 日志项目:
       - "2020-10-03": timeline/2020-10-03.md
       - "2020-10-18": timeline/2020-10-18.md
+
+extra_css:
+  - styles/index.css
+
+markdown_extensions:
+  - mdx_truly_sane_lists
