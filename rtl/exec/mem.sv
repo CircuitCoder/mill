@@ -83,7 +83,7 @@ gpreg readout;
 
 always_comb begin
   /* verilator lint_off CASEINCOMPLETE */
-  unique0 case(decoded.data.funct3)
+  unique case(decoded.data.funct3)
     // LBx
     3'b000: readout = 32'(signed'(shifted[7:0]));
     3'b100: readout = { 24'b0, shifted[7:0] } ;
@@ -93,6 +93,7 @@ always_comb begin
     3'b101: readout = { 16'b0, shifted[15:0] } ;
 
     3'b010: readout = shifted;
+    default: readout = 'hX;
   endcase
   /* verilator lint_on CASEINCOMPLETE */
 end
