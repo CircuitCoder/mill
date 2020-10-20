@@ -71,7 +71,7 @@ always_comb begin
 end
 
 for(genvar i = 0; i < CNT; i = i+1) begin
-  assign master_req[i].ready = slave_req.valid && slave_req.ready && sel === i;
+  assign master_req[i].ready = slave_req.valid && slave_req.ready && sel == i;
 end
 
 assign buffer_in.data = sel;
@@ -82,7 +82,7 @@ assign buffer_in.valid = slave_req.valid && slave_req.ready;
 
 // Response arbiter logic
 for (genvar i = 0; i < CNT; i = i+1) begin
-  assign master_resp[i].valid = slave_resp.valid && i === buffer_out.data && buffer_out.valid;
+  assign master_resp[i].valid = slave_resp.valid && i == buffer_out.data && buffer_out.valid;
   assign master_resp[i].data = slave_resp.data;
 end
 
