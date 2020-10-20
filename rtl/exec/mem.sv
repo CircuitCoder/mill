@@ -82,7 +82,6 @@ assign shifted = mem_resp.data >>> shift;
 gpreg readout;
 
 always_comb begin
-  /* verilator lint_off CASEINCOMPLETE */
   unique case(decoded.data.funct3)
     // LBx
     3'b000: readout = 32'(signed'(shifted[7:0]));
@@ -95,7 +94,6 @@ always_comb begin
     3'b010: readout = shifted;
     default: readout = 'hX;
   endcase
-  /* verilator lint_on CASEINCOMPLETE */
 end
 
 assign result.rd_idx = decoded.data.rd;

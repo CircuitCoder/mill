@@ -165,7 +165,7 @@ queue #(
 
 // We don't need to guard against valid here, because
 // RegFile's read results will only be effective on pipeline move edges
-assign ex_fb_idx = ex_result.data.rd_idx;
+assign ex_fb_idx = ex_result.valid ? ex_result.data.rd_idx : 'h0;
 assign ex_fb_val = ex_result.data.rd_val;
 
 assign br_valid = ex_result.valid && ex_result.data.br_valid;

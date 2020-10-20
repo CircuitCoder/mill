@@ -59,7 +59,7 @@ gpreg computation;
 always_comb begin
   unique case(funct3)
     0'b000: // ADD/SUB
-      computation = funct7_action_bit ? lhs - rhs : lhs + rhs;
+      computation = (funct7_action_bit && decoded.data.op == INSTR_OP) ? lhs - rhs : lhs + rhs;
     0'b001: // SLL
       computation = lhs <<< rhs[4:0];
     0'b010: // SLT
