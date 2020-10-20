@@ -39,9 +39,9 @@ always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
     sent <= '0;
   end else begin
-    if(mem_resp.fire()) begin
+    if(mem_resp.valid && mem_resp.ready) begin
       sent <= '0;
-    end else if(mem_req.fire()) begin
+    end else if(mem_req.valid && mem_req.ready) begin
       sent <= '1;
       sent_addr <= pc.data;
     end

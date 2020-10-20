@@ -106,7 +106,7 @@ always_ff @(posedge clk or posedge rst) begin
   end else begin
     if(mem_resp.valid) begin
       request_sent <= '0;
-    end else if(mem_req.fire()) begin
+    end else if(mem_req.valid && mem_req.ready) begin
       request_sent <= '1;
     end
   end

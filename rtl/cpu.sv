@@ -40,7 +40,7 @@ always_ff @(posedge clk or posedge rst) begin
   end else begin
     if(br_valid) pc <= br_target;
     // By defualt, npc = pc + 4 for RV32I impls
-    else if(if_pc.fire()) pc <= pc + 4;
+    else if(if_pc.ready) pc <= pc + 4;
   end
 end
 

@@ -13,22 +13,14 @@ interface decoupled #(
   modport out (
     output data,
     output valid,
-    input ready,
-
-    import fire
+    input ready
   );
 
   modport in (
     input data,
     input valid,
-    output ready,
-
-    import fire
+    output ready
   );
-
-  function bit fire();
-    fire = valid && ready;
-  endfunction
 endinterface : decoupled
 /* verilator lint_on UNOPTFLAT */
 

@@ -69,14 +69,14 @@ always_comb begin
 end
 
 for(genvar i = 0; i < CNT; i = i+1) begin
-  assign master_req[i].ready = slave_req.fire() && sel === i;
+  assign master_req[i].ready = slave_req.valid && slave_req.ready && sel === i;
 end
 
 assign buffer_in.data = sel;
 
 // Mitigate bug
 assign slave_req.valid = has_req && buffer_in.ready && !rst;
-assign buffer_in.valid = slave_req.fire();
+assign buffer_in.valid = slave_req.valid && slave_req.ready;
 
 // Response arbiter logic
 for (genvar i = 0; i < CNT; i = i+1) begin
@@ -90,7 +90,7 @@ for (genvar i = 0; i < CNT; i = i+1) begin
 end
 
 assign slave_resp.ready = buffer_out.valid && master_ready[buffer_out.data] && !rst;
-assign buffer_out.ready = slave_resp.fire();
+assign buffer_out.ready = slave_resp.valid && slave_resp.ready;
 
 endmodule : mem_arbiter
 

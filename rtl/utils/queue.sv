@@ -49,13 +49,13 @@ always_ff @(posedge clk or posedge rst) begin
     head <= 0;
     tail <= 0;
   end else begin
-    if(enq.fire()) tail <= tail + 1;
-    if(deq.fire()) head <= head + 1;
+    if(enq.valid && enq.ready) tail <= tail + 1;
+    if(deq.valid && deq.ready) head <= head + 1;
   end
 end
 
 always_ff @(posedge clk) begin
-  if(enq.fire()) store[tail] <= enq.data;
+  if(enq.valid && enq.ready) store[tail] <= enq.data;
 end
 
 endmodule
