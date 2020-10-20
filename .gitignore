@@ -351,3 +351,4 @@ bridge/build
 data
 *.gtkw
 *.wcfg
+doc/site
