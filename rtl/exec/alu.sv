@@ -16,14 +16,18 @@ module alu #(
 
 assign decoded.ready = '1;
 
-logic [31:0] lhs = decoded.data.rs1_val;
+logic [31:0] lhs;
 logic [31:0] rhs;
+assign lhs = decoded.data.rs1_val;
 
 // Instruction is R-type or I-type, hence:
-logic [2:0] funct3 = decoded.data.funct3;
-logic [6:0] funct7 = decoded.data.imm[11:5];
-logic funct7_action_bit = funct7[5];
+logic [2:0] funct3;
+logic [6:0] funct7;
+assign funct3 = decoded.data.funct3;
+assign funct7 = decoded.data.imm[11:5];
 logic inval_funct7;
+logic funct7_action_bit;
+assign funct7_action_bit = funct7[5];
 
 always_comb begin
   unique case(decoded.data.op)

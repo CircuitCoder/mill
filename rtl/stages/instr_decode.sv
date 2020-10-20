@@ -19,8 +19,9 @@ module instr_decode #(
 
 // This stage is combinatory logic, hence no clocking signal is needed
 logic _unused_signals = &{ flush, clk, rst };
-instr from = fetched.data.raw;
 decoded_instr result;
+instr from;
+assign from = fetched.data.raw;
 
 assign decoded.data = result;
 assign decoded.valid = fetched.valid;
@@ -94,9 +95,10 @@ end
 assign result.op = result_op;
 
 // Decode rs1, rs2, rd
-logic has_rs1 = result_fmt != INSTR_U && result_fmt != INSTR_J;
-logic has_rs2 = result_fmt != INSTR_U && result_fmt != INSTR_J && result_fmt != INSTR_I;
-logic has_rd = result_fmt != INSTR_S && result_fmt != INSTR_B;
+logic has_rs1, has_rs2, has_rd;
+assign has_rs1 = result_fmt != INSTR_U && result_fmt != INSTR_J;
+assign has_rs2 = result_fmt != INSTR_U && result_fmt != INSTR_J && result_fmt != INSTR_I;
+assign has_rd = result_fmt != INSTR_S && result_fmt != INSTR_B;
 
 // Prevents circular warning result -> regfile -> result
 reg_idx rs1;
@@ -109,7 +111,8 @@ assign result.rs2 = rs2;
 assign result.rd = has_rd ? from[11:7] : '0;
 
 // Decode imm
-logic sign_bit = from[31];
+logic sign_bit;
+assign sign_bit = from[31];
 always_comb begin // TODO: test does length mismatch triggers a warning?
   // We handle R-type instruction as if they are I-type. Then imm[11:4] = funct7
   unique case(result_fmt)

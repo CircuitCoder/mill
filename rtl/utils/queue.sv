@@ -24,8 +24,9 @@ typedef bit [IDX_WIDTH-1:0] idx;
 
 Data store [DEPTH];
 idx head, tail;
-wire full = tail + 1 === head;
-wire empty = tail === head;
+wire full, empty;
+assign full = tail + 1 === head;
+assign empty = tail === head;
 
 if(PIPE) begin
   assign enq.ready = (!full) || deq.valid;

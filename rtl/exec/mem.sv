@@ -17,12 +17,14 @@ module mem #(
   input rst
 );
 
-logic request_sent = '0;
+logic request_sent;
 
 addr raw;
 assign raw = decoded.data.rs1_val + decoded.data.imm;
-addr aligned = { raw[31:2], 2'b00 };
-logic [1:0] shift = raw[1:0];
+addr aligned;
+assign aligned = { raw[31:2], 2'b00 };
+logic [1:0] shift;
+assign shift = raw[1:0];
 
 assign mem_req.data.a = aligned;
 

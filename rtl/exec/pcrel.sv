@@ -20,8 +20,10 @@ assign rel = decoded.data.pc + decoded.data.imm;
 
 logic branching;
 logic inval_br_funct3;
-gpreg lhs = decoded.data.rs1_val;
-gpreg rhs = decoded.data.rs2_val;
+gpreg lhs;
+gpreg rhs;
+assign lhs = decoded.data.rs1_val;
+assign rhs = decoded.data.rs2_val;
 
 always_comb begin
   inval_br_funct3 = '0;
