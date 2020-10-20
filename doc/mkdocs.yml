@@ -21,9 +21,9 @@ nav:
     - GTKWave / FST: usage/gtkwave.md
   - 开发日志:
     - 主页: timeline/index.md
-    - 日志项目:
-      - "2020-10-03": timeline/2020-10-03.md
-      - "2020-10-18": timeline/2020-10-18.md
+    - "2020-10-03": timeline/2020-10-03.md
+    - "2020-10-18": timeline/2020-10-18.md
+    - "2020-10-21": timeline/2020-10-21.md
 
 extra_css:
   - styles/index.css
