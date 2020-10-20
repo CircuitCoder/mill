@@ -31,6 +31,7 @@ assign fetched.ready = decoded.ready;
 instr_op result_op;
 instr_fmt result_fmt;
 always_comb begin
+  result_fmt = 'X;
   // We don't have C-extension, hence:
   if(from[1:0] != 2'b11) begin
     result_op = INSTR_INVAL;

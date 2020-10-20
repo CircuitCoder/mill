@@ -16,6 +16,7 @@ module misc #(
 assign decoded.ready = '1;
 
 always_comb begin
+  result = 'X;
   result.rd_idx = decoded.data.rd;
   unique case(decoded.data.op)
     INSTR_JALR: begin

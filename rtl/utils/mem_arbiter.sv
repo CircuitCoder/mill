@@ -58,6 +58,8 @@ var bit has_req;
 
 always_comb begin
   has_req = '0;
+  sel = 'X;
+  slave_req.data = 'X;
   for(int i = CNT - 1; i >= 0; i = i - 1) begin
     master_idx casted = master_idx '(i);
     if(master_valid[casted]) begin
@@ -85,7 +87,7 @@ for (genvar i = 0; i < CNT; i = i+1) begin
 end
 
 wire master_ready [CNT];
-for (genvar i = 0; i < CNT; i = i+1) begin
+for(genvar i = 0; i < CNT; i = i+1) begin
   assign master_ready[i] = master_resp[i].ready;
 end
 
