@@ -72,7 +72,7 @@ always_comb begin
       computation = funct7_action_bit ? (signed'(lhs) >>> rhs[4:0]) : (lhs >> rhs[4:0]);
     0'b110: // OR
       computation = lhs | rhs;
-    0'b110: // AND
+    0'b111: // AND
       computation = lhs & rhs;
   endcase
 end
