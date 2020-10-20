@@ -114,6 +114,6 @@ always_comb begin
   endcase
 end
 
-endmodule;
+endmodule
 
 `endif // __EXECUTE_SV__

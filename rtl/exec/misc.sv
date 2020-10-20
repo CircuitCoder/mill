@@ -36,6 +36,6 @@ end
 // Misc is fully combinatory
 logic _unused = &{ clk, rst, flush };
 
-endmodule;
+endmodule
 
 `endif // __MISC_SV__

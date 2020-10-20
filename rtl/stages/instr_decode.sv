@@ -137,6 +137,6 @@ assign result.rs2_val = rs_val [1];
 // Assign pc
 assign result.pc = fetched.data.pc;
 
-endmodule;
+endmodule
 
 `endif // __INSTR_DECODE_SV__

@@ -88,6 +88,6 @@ assign result.br_target = 'X;
 // ALU is fully combinatory
 logic _unused = &{ clk, rst, flush };
 
-endmodule;
+endmodule
 
 `endif // __ALU_SV__
