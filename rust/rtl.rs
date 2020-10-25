@@ -112,7 +112,7 @@ impl MemInterface {
                         log::info!("ISA test passes");
                         result = Some(true);
                     } else if (pack.data & 1) == 1 {
-                        log::info!("ISA test failed case: {}", pack.data >> 1);
+                        log::error!("ISA test failed case: {}", pack.data >> 1);
                         result = Some(false);
                     } else {
                         log::info!("tohost: {}", pack.data);

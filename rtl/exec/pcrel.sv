@@ -32,9 +32,9 @@ always_comb begin
     3'b000: branching = lhs == rhs; // BEQ
     3'b001: branching = lhs != rhs; // BNE
     3'b100: branching = signed'(lhs) < signed'(rhs); // BLT
-    3'b101: branching = signed'(lhs) > signed'(rhs); // BGE
+    3'b101: branching = signed'(lhs) >= signed'(rhs); // BGE
     3'b110: branching = lhs < rhs; // BLTU
-    3'b111: branching = lhs > rhs; // BGEU
+    3'b111: branching = lhs >= rhs; // BGEU
     default: inval_br_funct3 = '1;
   endcase
 end
