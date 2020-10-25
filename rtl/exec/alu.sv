@@ -61,9 +61,9 @@ always_comb begin
     0'b001: // SLL
       computation = lhs << rhs[4:0];
     0'b010: // SLT
-      computation = (signed'(lhs) < signed'(rhs)) ? '1 : '0;
+      computation = (signed'(lhs) < signed'(rhs)) ? 32'b1 : '0;
     0'b011: // SLTU
-      computation = (lhs < rhs) ? '1 : '0;
+      computation = (lhs < rhs) ? 32'b1 : '0;
     0'b100: // XOR
       computation = lhs ^ rhs;
     0'b101: // SRL / SRA
