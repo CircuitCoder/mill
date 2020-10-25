@@ -43,8 +43,11 @@ assign result.rd_idx = decoded.data.rd;
 assign result.br_target = rel;
 
 logic inval_instr;
+logic inval_instr_align;
 always_comb begin
   inval_instr = '0;
+  inval_instr_align = '0;
+
   unique case(decoded.data.op)
     INSTR_AUIPC: begin
       result.br_valid = '0;
@@ -53,22 +56,22 @@ always_comb begin
     INSTR_JAL: begin
       result.br_valid = '1;
       result.rd_val = decoded.data.pc + 4; // TODO: change me when adding C-ext
+      inval_instr_align = rel[1:0] != '0;
     end
     INSTR_BRANCH: begin
       result.br_valid = branching;
       result.rd_val = 'X;
       inval_instr = inval_br_funct3;
+      inval_instr_align = branching && rel[1:0] != '0;
     end
   endcase
 end
 
-// TODO: inval instr
-logic _unused_inval = inval_instr;
+assign result.ex_valid = inval_instr || inval_instr_align;
+assign result.ex = inval_instr ? EX_ILLEGAL_INSTR : EX_INSTR_ADDR_MISALIGNED;
+assign result.ex_tval = inval_instr ? '0 : rel;
 
 assign result.ret_valid = '0;
-assign result.ex_valid = '0;
-assign result.ex = '0;
-assign result.ex_tval = '0;
 
 // PCRel is fully combinatory
 logic _unused = &{ clk, rst };

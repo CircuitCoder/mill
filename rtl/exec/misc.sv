@@ -24,6 +24,11 @@ assign result.ex_valid = default_ex_valid || invalid_priv;
 assign result.ex = invalid_priv ? EX_ILLEGAL_INSTR : default_ex;
 assign result.ex_tval = default_ex_tval;
 
+gpreg jalr_dest_raw;
+gpreg jalr_dest;
+assign jalr_dest_raw = decoded.data.rs1_val + decoded.data.imm;
+assign jalr_dest = { jalr_dest_raw[31:1], 1'b0 };
+
 always_comb begin
   result = 'X;
   result.rd_idx = decoded.data.rd;
@@ -37,8 +42,14 @@ always_comb begin
   unique case(decoded.data.op)
     INSTR_JALR: begin
       result.br_valid = '1;
-      result.br_target = decoded.data.rs1_val + decoded.data.imm;
+      result.br_target = jalr_dest;
       result.rd_val = decoded.data.pc + 4; // TODO: C-extension warning
+
+      if(jalr_dest[1:0] != '0) begin
+        default_ex_valid = '1;
+        default_ex = EX_INSTR_ADDR_MISALIGNED;
+        default_ex_tval = jalr_dest;
+      end
     end
     INSTR_MISC_MEM: begin
       // FENCE and FENCE.I, regard as no-op
@@ -76,7 +87,7 @@ always_comb begin
 end
 
 // Misc is fully combinatory
-logic _unused = &{ clk, rst };
+logic _unused = &{ clk, rst, jalr_dest_raw[0] };
 
 endmodule
 
