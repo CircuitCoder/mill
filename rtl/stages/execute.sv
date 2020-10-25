@@ -7,6 +7,7 @@
 `include "exec/misc.sv"
 `include "exec/pcrel.sv"
 `include "exec/mem.sv"
+`include "exec/csr.sv"
 
 module execute #(
 ) (
@@ -15,6 +16,9 @@ module execute #(
 
   decoupled.out mem_req,
   decoupled.in mem_resp,
+
+  decoupled.out csrfile_req,
+  input csr_resp csrfile_resp,
 
   input flush,
 
@@ -30,16 +34,19 @@ decoupled #(.Data(decoded_instr)) misc_input ();
 decoupled #(.Data(decoded_instr)) alu_input ();
 decoupled #(.Data(decoded_instr)) mem_input ();
 decoupled #(.Data(decoded_instr)) pcrel_input ();
+decoupled #(.Data(decoded_instr)) csr_input ();
 
 exec_result misc_result;
 exec_result alu_result;
 exec_result mem_result;
 exec_result pcrel_result;
+exec_result csr_result;
 
 assign misc_input.data = decoded.data;
 assign alu_input.data = decoded.data;
 assign mem_input.data = decoded.data;
 assign pcrel_input.data = decoded.data;
+assign csr_input.data = decoded.data;
 
 /* Misc (LUI/JALR/Invalid) */
 misc #() misc_inst (
@@ -71,6 +78,16 @@ mem #() mem_inst (
   .result(mem_result),
 
   .mem_req, .mem_resp,
+
+  .flush, .clk, .rst
+);
+
+/* CSR */
+csr #() csr_inst (
+  .decoded(csr_input),
+  .result(csr_result),
+
+  .csrfile_req, .csrfile_resp,
 
   .flush, .clk, .rst
 );
@@ -111,6 +128,14 @@ always_comb begin
       decoded.ready = pcrel_input.ready;
       result.valid = pcrel_input.ready && decoded.valid;
       result.data = pcrel_result;
+    end
+    INSTR_SYSTEM: begin
+      if(decoded.data.funct3 != 3'b000) begin
+        csr_input.valid = decoded.valid;
+        decoded.ready = csr_input.ready;
+        result.valid = csr_input.ready && decoded.valid;
+        result.data = csr_result;
+      end
     end
   endcase
 end

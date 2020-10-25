@@ -96,6 +96,7 @@ end
 assign result.op = result_op;
 
 // Decode rs1, rs2, rd
+// TODO: do we have to avoid reading rs for CSRRxI ?
 logic has_rs1, has_rs2, has_rd;
 assign has_rs1 = result_fmt != INSTR_U && result_fmt != INSTR_J;
 assign has_rs2 = result_fmt != INSTR_U && result_fmt != INSTR_J && result_fmt != INSTR_I;

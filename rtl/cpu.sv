@@ -1,6 +1,8 @@
 `include "types.sv"
 
 `include "components/regfile.sv"
+`include "components/csrfile.sv"
+`include "components/mem_arbiter.sv"
 
 `include "stages/instr_fetch.sv"
 `include "stages/instr_decode.sv"
@@ -94,6 +96,28 @@ regfile #(
 
   .write_addr(write_idx),
   .write_data(write_val),
+  .clk,
+  .rst
+);
+
+decoupled #(
+  .Data(csr_req)
+) csrfile_req;
+
+csr_resp csrfile_resp;
+
+csr_effect csrfile_effect;
+assign csrfile_effect.t = CSR_EFF_IDLE;
+assign csrfile_effect.epc = 'X;
+assign csrfile_effect.tval = 'X;
+
+csrfile #(
+) csrfile_inst (
+  .req(csrfile_req),
+  .resp(csrfile_resp),
+
+  .effect(csrfile_effect),
+
   .clk,
   .rst
 );
@@ -205,6 +229,9 @@ execute #(
 
   .mem_req(mem_sub_req[0]),
   .mem_resp(mem_sub_resp[0]),
+
+  .csrfile_req,
+  .csrfile_resp,
 
   .flush('0),
   .clk, .rst
