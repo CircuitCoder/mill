@@ -37,7 +37,6 @@ pub struct SharedArgs {
 }
 
 #[derive(StructOpt, Debug)]
-#[structopt(about = "Subcommand")]
 enum Command {
     /// Run CPU Simulation
     Run(RunArgs),
