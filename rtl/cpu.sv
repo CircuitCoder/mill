@@ -265,7 +265,6 @@ execute #(
   .csrfile_req,
   .csrfile_resp,
 
-  .flush('0),
   .clk, .rst
 );
 

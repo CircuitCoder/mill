@@ -8,7 +8,6 @@ module misc #(
   decoupled.in decoded,
   output exec_result result,
 
-  input flush,
   input clk,
   input rst
 );
@@ -40,7 +39,7 @@ always_comb begin
 end
 
 // Misc is fully combinatory
-logic _unused = &{ clk, rst, flush };
+logic _unused = &{ clk, rst };
 
 endmodule
 

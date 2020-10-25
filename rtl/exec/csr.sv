@@ -10,8 +10,6 @@ module csr #() (
   decoupled.in decoded,
   output exec_result result,
 
-  input flush,
-
   input clk,
   input rst
 );
@@ -52,7 +50,7 @@ assign result.ex = '0;
 
 // TODO: flush pipeline
 
-wire _unused = &{ clk, rst, flush };
+wire _unused = &{ clk, rst };
 
 endmodule
 

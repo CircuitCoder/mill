@@ -8,8 +8,6 @@ module alu #(
   decoupled.in decoded,
   output exec_result result,
 
-  input flush,
-
   input clk,
   input rst
 );
@@ -89,7 +87,7 @@ assign result.ex_valid = '0;
 assign result.ex = '0;
 
 // ALU is fully combinatory
-logic _unused = &{ clk, rst, flush };
+logic _unused = &{ clk, rst };
 
 endmodule
 

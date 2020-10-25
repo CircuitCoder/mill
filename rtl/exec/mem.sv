@@ -11,8 +11,6 @@ module mem #(
   decoupled.out mem_req,
   decoupled.in mem_resp,
 
-  input flush,
-
   input clk,
   input rst
 );
@@ -66,7 +64,6 @@ end
 
 // TODO: handles inval addr & inval instr
 
-logic _unused_flush = flush;
 logic _unused_inval = |{ inval_addr, inval_instr };
 
 assign mem_req.data.be = be;

@@ -20,8 +20,6 @@ module execute #(
   decoupled.out csrfile_req,
   input csr_resp csrfile_resp,
 
-  input flush,
-
   input clk,
   input rst
 );
@@ -53,7 +51,7 @@ misc #() misc_inst (
   .decoded(misc_input),
   .result(misc_result),
 
-  .flush, .clk, .rst
+  .clk, .rst
 );
 
 /* ALU */
@@ -61,7 +59,7 @@ alu #() alu_inst (
   .decoded(alu_input),
   .result(alu_result),
 
-  .flush, .clk, .rst
+  .clk, .rst
 );
 
 /* PCRel (AUIPC/B/JAL) */
@@ -69,7 +67,7 @@ pcrel #() pcrel_inst (
   .decoded(pcrel_input),
   .result(pcrel_result),
 
-  .flush, .clk, .rst
+  .clk, .rst
 );
 
 /* Mem */
@@ -79,7 +77,7 @@ mem #() mem_inst (
 
   .mem_req, .mem_resp,
 
-  .flush, .clk, .rst
+  .clk, .rst
 );
 
 /* CSR */
@@ -89,7 +87,7 @@ csr #() csr_inst (
 
   .csrfile_req, .csrfile_resp,
 
-  .flush, .clk, .rst
+  .clk, .rst
 );
 
 // TODO: handle MISC-MEM in misc
