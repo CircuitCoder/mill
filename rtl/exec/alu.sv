@@ -59,7 +59,7 @@ always_comb begin
     0'b000: // ADD/SUB
       computation = (funct7_action_bit && decoded.data.op == INSTR_OP) ? lhs - rhs : lhs + rhs;
     0'b001: // SLL
-      computation = lhs <<< rhs[4:0];
+      computation = lhs << rhs[4:0];
     0'b010: // SLT
       computation = (signed'(lhs) < signed'(rhs)) ? '1 : '0;
     0'b011: // SLTU
@@ -67,7 +67,7 @@ always_comb begin
     0'b100: // XOR
       computation = lhs ^ rhs;
     0'b101: // SRL / SRA
-      computation = funct7_action_bit ? (signed'(lhs) >>> rhs[4:0]) : (lhs >> rhs[4:0]);
+      computation = funct7_action_bit ? unsigned'(signed'(lhs) >>> rhs[4:0]) : (lhs >> rhs[4:0]);
     0'b110: // OR
       computation = lhs | rhs;
     0'b111: // AND
