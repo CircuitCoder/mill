@@ -75,16 +75,13 @@ always_comb begin
   endcase
 end
 
-// TODO: invalid instruction on invalid funct7
-logic _unused_inval_funct7 = inval_funct7;
-
 assign result.rd_idx = decoded.data.rd;
 assign result.rd_val = computation;
 assign result.br_valid = '0;
 assign result.br_target = 'X;
 assign result.ret_valid = '0;
-assign result.ex_valid = '0;
-assign result.ex = '0;
+assign result.ex_valid = inval_funct7;
+assign result.ex = EX_ILLEGAL_INSTR;
 
 // ALU is fully combinatory
 logic _unused = &{ clk, rst };
