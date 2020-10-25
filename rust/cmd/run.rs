@@ -39,6 +39,14 @@ pub struct RunArgs {
     #[structopt(long, default_value = "0x80000000")]
     mem_base: Addr,
 
+    /// Enable Spike-style tohost/fromhost interface. If true, timeout or isa testcase failure will result in an non-zero exit code.
+    #[structopt(long, short)]
+    spike: bool,
+
+    /// Spike-style interface base address
+    #[structopt(long, default_value = "0x80001000")]
+    spike_base: Addr,
+
     /// Tracing waveform
     #[structopt(short, long)]
     trace: Option<PathBuf>,
@@ -61,19 +69,35 @@ impl RunArgs {
         cpu.set_rst(true);
 
         log::debug!("Creating MemInterface...");
-        let mut mem_handler = cpu.mem();
+        let spike = if self.spike { Some(self.spike_base.0) } else { None };
+        let mut mem_handler = cpu.mem(spike);
+
+        let mut isa_passed = false;
 
         for cycle in 0..shared.cycles {
             if cycle == shared.reset_for {
                 cpu.set_rst(false);
             }
 
-            mem_handler.handle_single_tick(&mut mem);
+            let isa_result = mem_handler.handle_single_tick(&mut mem);
+            let cpu_finished = cpu.tick();
 
-            cpu.tick();
+            if isa_result == Some(true) {
+                isa_passed = true;
+            }
+
+            if isa_result.is_some() || cpu_finished {
+                log::info!("Terminated after cycle: {}", cycle);
+                break;
+            }
         }
 
         log::debug!("Simulation done");
-        Ok(())
+
+        if self.spike && !isa_passed {
+            Err(anyhow::anyhow!("ISA test failed"))
+        } else {
+            Ok(())
+        }
     }
 }

@@ -51,19 +51,20 @@ impl CPU {
         Self(inner)
     }
 
-    pub fn tick(&mut self) {
-        ffi::tick(&mut self.0);
+    pub fn tick(&mut self) -> bool {
+        ffi::tick(&mut self.0)
     }
 
     pub fn set_rst(&mut self, rst: bool) {
         ffi::set_rst(&mut self.0, rst);
     }
 
-    pub fn mem(&mut self) -> MemInterface {
+    pub fn mem(&mut self, spike: Option<u64>) -> MemInterface {
         MemInterface {
             req: ffi::mem_req(&mut self.0),
             resp: ffi::mem_resp(&mut self.0),
             pending: None,
+            spike,
         }
     }
 }
@@ -72,10 +73,13 @@ pub struct MemInterface {
     req: UniquePtr<ffi::MemReq>,
     resp: UniquePtr<ffi::MemResp>,
     pending: Option<Vec<u64>>,
+    spike: Option<u64>,
 }
 
 impl MemInterface {
-    pub fn handle_single_tick(&mut self, mem: &mut Mem) {
+    pub fn handle_single_tick(&mut self, mem: &mut Mem) -> Option<bool> {
+        let mut result = None;
+
         if let Some(ref pending) = self.pending {
             // Process pending request from the previous cycle
             ffi::no_read(&mut self.req);
@@ -95,19 +99,21 @@ impl MemInterface {
 
             if !has_req {
                 ffi::no_write(&mut self.resp);
-                return;
+                return None;
             }
 
             let data = mem.mem.get(&pack.addr).cloned().unwrap_or(0);
 
             // Write
             if pack.we {
-                if pack.addr == 0x80001000u64 {
+                if Some(pack.addr) == self.spike {
                     // tohost
                     if pack.data == 1 {
                         log::info!("ISA test passes");
+                        result = Some(true);
                     } else if (pack.data & 1) == 1 {
                         log::info!("ISA test failed case: {}", pack.data >> 1);
+                        result = Some(false);
                     } else {
                         log::info!("tohost: {}", pack.data);
                     }
@@ -135,5 +141,7 @@ impl MemInterface {
                 self.pending = Some(data_pack);
             }
         }
+
+        result
     }
 }
