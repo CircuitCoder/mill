@@ -17,10 +17,12 @@ logic invalid_priv;
 logic default_ex_valid;
 logic default_ret_valid;
 ex_type default_ex;
+gpreg default_ex_tval;
 
 assign result.ret_valid = default_ret_valid;
 assign result.ex_valid = default_ex_valid || invalid_priv;
 assign result.ex = invalid_priv ? EX_ILLEGAL_INSTR : default_ex;
+assign result.ex_tval = default_ex_tval;
 
 always_comb begin
   result = 'X;
@@ -30,6 +32,7 @@ always_comb begin
   default_ex_valid = '0;
   default_ex = ex_type'('X);
   default_ret_valid = '0;
+  default_ex_tval = 'X;
 
   unique case(decoded.data.op)
     INSTR_JALR: begin

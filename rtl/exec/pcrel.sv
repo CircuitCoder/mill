@@ -68,6 +68,7 @@ logic _unused_inval = inval_instr;
 assign result.ret_valid = '0;
 assign result.ex_valid = '0;
 assign result.ex = '0;
+assign result.ex_tval = '0;
 
 // PCRel is fully combinatory
 logic _unused = &{ clk, rst };

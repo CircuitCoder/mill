@@ -82,6 +82,7 @@ assign result.br_target = 'X;
 assign result.ret_valid = '0;
 assign result.ex_valid = inval_funct7;
 assign result.ex = EX_ILLEGAL_INSTR;
+assign result.ex_tval = '0;
 
 // ALU is fully combinatory
 logic _unused = &{ clk, rst };

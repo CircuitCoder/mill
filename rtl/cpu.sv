@@ -211,9 +211,9 @@ always_comb begin
 
     csrfile_effect.t = CSR_EFF_EX;
     csrfile_effect.src = ex_result.data.ex;
+    csrfile_effect.tval = ex_result.data.ex_tval;
     // Here we assumes that EX is combinatory
     csrfile_effect.epc = ex_decoded.data.pc;
-    // TODO: tval?
   end else if(ex_result.data.ret_valid) begin
     br_valid = '1;
     br_target = csr_mepc;

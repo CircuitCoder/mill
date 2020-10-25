@@ -28,6 +28,7 @@ typedef struct packed {
 
   logic ex_valid;
   ex_type ex;
+  gpreg ex_tval;
 } exec_result;
 // Flag priorities: ex_valid > ret_valid > br_valid
 
