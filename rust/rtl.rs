@@ -102,9 +102,15 @@ impl MemInterface {
 
             // Write
             if pack.we {
-                if pack.addr == 0x20000000u64 {
+                if pack.addr == 0x80001000u64 {
                     // tohost
-                    log::info!("tohost: {}", pack.data);
+                    if pack.data == 1 {
+                        log::info!("ISA test passes");
+                    } else if (pack.data & 1) == 1 {
+                        log::info!("ISA test failed case: {}", pack.data >> 1);
+                    } else {
+                        log::info!("tohost: {}", pack.data);
+                    }
                 } else {
                     log::debug!("writing: 0x{:x} <- 0x{:x} / 0b{:b}", pack.addr, pack.data, pack.be);
                     let mut buffer = data.to_le_bytes();
