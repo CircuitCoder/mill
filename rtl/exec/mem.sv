@@ -67,24 +67,24 @@ end
 logic _unused_inval = |{ inval_addr, inval_instr };
 
 assign mem_req.data.be = be;
-assign mem_req.data.d = decoded.data.rs2_val <<< shift;
+assign mem_req.data.d = decoded.data.rs2_val <<< (shift * 8);
 assign mem_req.valid = decoded.valid && !request_sent;
 
 assign mem_resp.ready = '1;
 assign decoded.ready = mem_resp.valid;
 
 mtrans shifted;
-assign shifted = mem_resp.data >>> shift;
+assign shifted = mem_resp.data >>> (shift * 8);
 gpreg readout;
 
 always_comb begin
   unique case(decoded.data.funct3)
     // LBx
-    3'b000: readout = 32'(signed'(shifted[7:0]));
+    3'b000: readout = unsigned'(32'(signed'(shifted[7:0])));
     3'b100: readout = { 24'b0, shifted[7:0] } ;
 
     // LH
-    3'b001: readout = 32'(signed'(shifted[15:0]));
+    3'b001: readout = unsigned'(32'(signed'(shifted[15:0])));
     3'b101: readout = { 16'b0, shifted[15:0] } ;
 
     3'b010: readout = shifted;

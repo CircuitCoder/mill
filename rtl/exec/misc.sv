@@ -37,12 +37,20 @@ always_comb begin
       result.br_target = decoded.data.rs1_val + decoded.data.imm;
       result.rd_val = decoded.data.pc + 4; // TODO: C-extension warning
     end
+    INSTR_MISC_MEM: begin
+      // FENCE and FENCE.I, regard as no-op
+      if(decoded.data.funct3 != '0 && decoded.data.funct3 != 3'b1) begin
+        default_ex_valid = '1;
+        default_ex = EX_ILLEGAL_INSTR;
+      end
+    end
     INSTR_LUI: begin
       result.br_valid = '0;
       result.rd_val = decoded.data.imm;
     end
     INSTR_INVAL: begin
-      // TODO: Exception
+      default_ex_valid = '1;
+      default_ex = EX_ILLEGAL_INSTR;
     end
     INSTR_SYSTEM: begin
       if(decoded.data.imm[4:0] == 5'b0) begin

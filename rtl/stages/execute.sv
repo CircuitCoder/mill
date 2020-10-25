@@ -90,9 +90,6 @@ csr #() csr_inst (
   .clk, .rst
 );
 
-// TODO: handle MISC-MEM in misc
-// TODO: handle SYSTEM in misc
-
 /* Arbiter */
 
 always_comb begin
@@ -103,7 +100,7 @@ always_comb begin
   result.valid = '0;
 
   unique case(decoded.data.op)
-    INSTR_INVAL, INSTR_JALR, INSTR_LUI: begin
+    INSTR_INVAL, INSTR_JALR, INSTR_LUI, INSTR_MISC_MEM: begin
       misc_input.valid = decoded.valid;
       decoded.ready = misc_input.ready;
       result.valid = misc_input.ready && decoded.valid;
