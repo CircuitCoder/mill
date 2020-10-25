@@ -5,15 +5,15 @@
 
 // All implemented exceptions
 typedef enum [3:0] {
-  INSTR_ADDR_MISALIGNED = 'h0,
-  INSTR_ACCESS_FAULT = 'h1,
-  ILLEGAL_INSTR = 'h2,
-  BREAKPOINT = 'h3,
-  LOAD_ADDR_MISALIGNED = 'h4,
-  LOAD_ACCESS_FAULT = 'h5,
-  STORE_ADDR_MISALIGNED = 'h6,
-  STORE_ACCESS_FAULT = 'h7,
-  M_ECALL = 'hB
+  EX_INSTR_ADDR_MISALIGNED = 'h0,
+  EX_INSTR_ACCESS_FAULT = 'h1,
+  EX_ILLEGAL_INSTR = 'h2,
+  EX_BREAKPOINT = 'h3,
+  EX_LOAD_ADDR_MISALIGNED = 'h4,
+  EX_LOAD_ACCESS_FAULT = 'h5,
+  EX_STORE_ADDR_MISALIGNED = 'h6,
+  EX_STORE_ACCESS_FAULT = 'h7,
+  EX_M_ECALL = 'hB
 } ex_type;
 
 typedef struct packed {

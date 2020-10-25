@@ -133,6 +133,11 @@ always_comb begin
         decoded.ready = csr_input.ready;
         result.valid = csr_input.ready && decoded.valid;
         result.data = csr_result;
+      end else begin
+        misc_input.valid = decoded.valid;
+        decoded.ready = misc_input.ready;
+        result.valid = misc_input.ready && decoded.valid;
+        result.data = misc_result;
       end
     end
   endcase
