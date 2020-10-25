@@ -18,6 +18,11 @@ assign decoded.ready = '1;
 always_comb begin
   result = 'X;
   result.rd_idx = decoded.data.rd;
+
+  result.ret_valid = '0;
+  result.ex_valid = '0;
+  result.ex = '0;
+
   unique case(decoded.data.op)
     INSTR_JALR: begin
       result.br_valid = '1;

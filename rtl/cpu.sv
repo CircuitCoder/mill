@@ -107,12 +107,15 @@ decoupled #(
 csr_resp csrfile_resp;
 
 csr_effect csrfile_effect;
-assign csrfile_effect.t = CSR_EFF_IDLE;
-assign csrfile_effect.epc = 'X;
-assign csrfile_effect.tval = 'X;
+
+gpreg csr_mtvec;
+gpreg csr_mepc;
 
 csrfile #(
 ) csrfile_inst (
+  .csr_mtvec,
+  .csr_mepc,
+
   .req(csrfile_req),
   .resp(csrfile_resp),
 
@@ -192,8 +195,37 @@ queue #(
 assign ex_fb_idx = ex_result.valid ? ex_result.data.rd_idx : 'h0;
 assign ex_fb_val = ex_result.data.rd_val;
 
-assign br_valid = ex_result.valid && ex_result.data.br_valid;
-assign br_target = ex_result.data.br_target;
+// Branching and csr effects
+always_comb begin
+  csrfile_effect.src = 'X;
+  csrfile_effect.epc = 'X;
+  csrfile_effect.tval = 'X;
+
+  if(!ex_result.valid) begin
+    br_valid = '0;
+    br_target = 'X;
+    csrfile_effect.t = CSR_EFF_IDLE;
+  end else if(ex_result.data.ex_valid) begin
+    br_valid = '1;
+    br_target = csr_mtvec;
+
+    csrfile_effect.t = CSR_EFF_EX;
+    csrfile_effect.src = ex_result.data.ex;
+    // Here we assumes that EX is combinatory
+    csrfile_effect.epc = ex_decoded.data.pc;
+    // TODO: tval?
+  end else if(ex_result.data.ret_valid) begin
+    br_valid = '1;
+    br_target = csr_mepc;
+
+    csrfile_effect.t = CSR_EFF_RET;
+  end else begin
+    br_valid = ex_result.data.br_valid;
+    br_target = ex_result.data.br_target;
+
+    csrfile_effect.t = CSR_EFF_INSTRET;
+  end
+end
 
 /* Stages */
 
@@ -239,7 +271,7 @@ execute #(
 
 /* Commit */
 assign commit.ready = '1;
-assign rd_idx = commit.valid ? commit.data.rd_idx : '0;
+assign rd_idx = commit.valid && !commit.data.ex_valid ? commit.data.rd_idx : '0;
 assign rd_val = commit.data.rd_val;
 
 // Void all unused signals

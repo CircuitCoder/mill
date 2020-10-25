@@ -60,8 +60,9 @@ typedef enum {
 typedef struct packed {
   csr_effect_type t;
   // Payloads
+  logic [3:0] src;
   gpreg epc;
-  gpreg tval; // or int source
+  gpreg tval;
 } csr_effect;
 
 `endif // __CSR_ENCODE_SV__

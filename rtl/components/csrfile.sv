@@ -6,7 +6,8 @@
 /* CSR file containing mutable CSR variables */
 module csrfile #() (
   /* Exported CSR Variables */
-  // output gpreg mtvec,
+  output gpreg csr_mtvec,
+  output gpreg csr_mepc,
 
   /* CSR exec stuff */
   decoupled.in req,
@@ -33,6 +34,9 @@ gpreg mscratch;
 gpreg mepc;
 gpreg mcause;
 gpreg mtval;
+
+assign csr_mtvec = mtvec;
+assign csr_mepc = mepc;
 
 logic msie;
 logic mtie;
@@ -121,6 +125,14 @@ always_ff @(posedge clk or posedge rst) begin
     mscratch <= '0;
     mcause <= '0;
     mtval <= '0;
+  end else if(effect.t == CSR_EFF_EX) begin
+    mcause <= 32'(effect.src);
+    mepc <= effect.epc;
+    mtval <= effect.tval;
+    mpie <= mie;
+    mie <= '0;
+  end else if(effect.t == CSR_EFF_RET) begin
+    mie <= mpie;
   end else if(req.valid) begin
     case (req.data.a)
       CSR_MSTATUS: begin
@@ -148,9 +160,6 @@ always_ff @(posedge clk or posedge rst) begin
     endcase
   end
 end
-
-// TODO: impl ex
-wire _unused = &{ effect.epc, effect.tval };
 
 endmodule
 

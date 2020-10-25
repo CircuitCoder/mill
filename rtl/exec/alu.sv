@@ -84,6 +84,9 @@ assign result.rd_idx = decoded.data.rd;
 assign result.rd_val = computation;
 assign result.br_valid = '0;
 assign result.br_target = 'X;
+assign result.ret_valid = '0;
+assign result.ex_valid = '0;
+assign result.ex = '0;
 
 // ALU is fully combinatory
 logic _unused = &{ clk, rst, flush };

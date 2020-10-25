@@ -65,7 +65,6 @@ always_comb begin
 end
 
 // TODO: handles inval addr & inval instr
-// TODO: handles flush
 
 logic _unused_flush = flush;
 logic _unused_inval = |{ inval_addr, inval_instr };
@@ -100,6 +99,9 @@ assign result.rd_idx = decoded.data.rd;
 assign result.rd_val = readout;
 assign result.br_valid = '0;
 assign result.br_target = 'X;
+assign result.ret_valid = '0;
+assign result.ex_valid = '0;
+assign result.ex = '0;
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin

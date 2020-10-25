@@ -46,6 +46,11 @@ assign result.rd_idx = decoded.data.rd;
 assign result.rd_val = csrfile_resp.d;
 assign result.br_valid = '0;
 assign result.br_target = 'X;
+assign result.ret_valid = '0;
+assign result.ex_valid = '0;
+assign result.ex = '0;
+
+// TODO: flush pipeline
 
 wire _unused = &{ clk, rst, flush };
 
