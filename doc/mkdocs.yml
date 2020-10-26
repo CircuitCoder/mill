@@ -4,6 +4,7 @@ repo_name: CircuitCoder/mill
 edit_uri: edit/master/doc/docs/
 
 plugins:
+  - search:
   - git-revision-date-localized:
       type: iso_datetime
       fallback_to_build_date: true
@@ -12,6 +13,7 @@ plugins:
 
 theme:
   name: material
+  language: zh
   palette:
     primary: blue grey
     accent: orange
