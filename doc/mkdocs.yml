@@ -34,6 +34,7 @@ nav:
     - 扩展开发指南: arch/ext.md
   - 测试框架:
     - Recipes: usage/recipes.md
+    - riscv-tests: usage/riscv-tests.md
     - GTKWave / FST: usage/gtkwave.md
   - 开发日志:
     - 主页: timeline/index.md
@@ -41,9 +42,13 @@ nav:
     - "2020-10-18": timeline/2020-10-18.md
     - "2020-10-21": timeline/2020-10-21.md
     - "2020-10-25": timeline/2020-10-25.md
+    - "2020-10-26": timeline/2020-10-26.md
 
 extra_css:
   - styles/index.css
 
 markdown_extensions:
   - mdx_truly_sane_lists
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.superfences
