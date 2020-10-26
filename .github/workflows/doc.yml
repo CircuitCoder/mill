@@ -27,7 +27,6 @@ jobs:
 
       - name: Cache dependencies
         uses: actions/cache@v2
-        working-directory: ./doc
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -38,13 +37,13 @@ jobs:
         run: python3 -m pip install -r ./requirements.txt
         working-directory: ./doc
 
-      - run: mkdocs build
+      - name: Build site
+        run: mkdocs build
         working-directory: ./doc
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        working-directory: ./doc
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          publish_dir: ./doc/site
 
