@@ -1,6 +1,15 @@
 site_name: Mill
 repo_url: https://github.com/CircuitCoder/mill
+repo_name: CircuitCoder/mill
 edit_uri: edit/master/doc/docs/
+
+plugins:
+  - git-revision-date-localized:
+      type: iso_datetime
+      fallback_to_build_date: true
+      locale: zh
+      time_zone: Asia/Shanghai
+
 theme:
   name: material
   palette:
@@ -9,6 +18,8 @@ theme:
   features:
     - navigation.tabs
     - navigation.instant
+  icon:
+    repo: fontawesome/brands/github
 
 nav:
   - 主页: index.md
