@@ -79,6 +79,7 @@ end
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
     state <= STATE_REQ;
+    holding_instr <= 'X;
   end else begin
     state <= state_n;
 

@@ -93,6 +93,7 @@ always_comb begin
   alu_input.valid = '0;
   mem_input.valid = '0;
   pcrel_input.valid = '0;
+  csr_input.valid = '0;
   result.valid = '0;
 
   unique case(decoded.data.op)

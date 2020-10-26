@@ -46,8 +46,8 @@ assign result.br_valid = '0;
 assign result.br_target = 'X;
 assign result.ret_valid = '0;
 assign result.ex_valid = '0;
-assign result.ex = '0;
-assign result.ex_tval = '0;
+assign result.ex = ex_type'('X);
+assign result.ex_tval = 'X;
 
 wire _unused = &{ clk, rst };
 

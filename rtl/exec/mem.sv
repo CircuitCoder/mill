@@ -130,7 +130,7 @@ always_comb begin
     result.ex_tval = raw;
   end else begin
     result.ex_valid = '0;
-    result.ex = 'X;
+    result.ex = ex_type'('X);
     result.ex_tval = 'X;
   end
 end

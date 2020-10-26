@@ -1,6 +1,7 @@
 `include "types.sv"
 
 module top #(
+  parameter [31:0] BOOT_VEC = 'h80000000,
   parameter ADDR_WIDTH = 32,
   parameter DATA_WIDTH = 32,
   parameter INT_SRC_CNT = 1
@@ -46,7 +47,8 @@ assign mem_resp.valid = mem_resp_valid;
 assign mem_resp_ready = mem_resp.ready;
 
 cpu #(
-  INT_SRC_CNT
+  .INT_SRC_CNT(INT_SRC_CNT),
+  .BOOT_VEC(BOOT_VEC)
 ) cpu (
   .mem_req,
   .mem_resp,

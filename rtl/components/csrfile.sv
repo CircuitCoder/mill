@@ -121,10 +121,12 @@ always_ff @(posedge clk or posedge rst) begin
     msie <= '0;
     meie <= '0;
     
+    mepc <= '0;
     mtvec <= '0;
     mscratch <= '0;
     mcause <= '0;
     mtval <= '0;
+    countinhibit <= '0;
   end else if(effect.t == CSR_EFF_EX) begin
     mcause <= 32'(effect.src);
     mepc <= effect.epc;

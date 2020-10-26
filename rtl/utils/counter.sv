@@ -5,13 +5,13 @@ module counter #(
   parameter int BOUND = 1,
   parameter int WIDTH = BOUND == 1 ? 1 : $clog2(BOUND)
 ) (
-  input var tick,
-  output var [WIDTH-1:0] current,
+  input tick,
+  output logic [WIDTH-1:0] current,
 
   input flush,
 
-  input var clk,
-  input var rst
+  input clk,
+  input rst
 );
 
 if(BOUND === 1) begin

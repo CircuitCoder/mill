@@ -8,8 +8,6 @@
 `include "stages/instr_decode.sv"
 `include "stages/execute.sv"
 
-`include "types.sv"
-
 module cpu #(
   parameter INT_SRC_CNT = 1,
   parameter [31:0] BOOT_VEC = 'h80000000
@@ -102,7 +100,7 @@ regfile #(
 
 decoupled #(
   .Data(csr_req)
-) csrfile_req;
+) csrfile_req ();
 
 csr_resp csrfile_resp;
 
