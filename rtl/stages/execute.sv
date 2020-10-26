@@ -24,10 +24,6 @@ module execute #(
   input rst
 );
 
-always begin
-  assert(result.ready);
-end
-
 decoupled #(.Data(decoded_instr)) misc_input ();
 decoupled #(.Data(decoded_instr)) alu_input ();
 decoupled #(.Data(decoded_instr)) mem_input ();

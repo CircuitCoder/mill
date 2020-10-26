@@ -49,10 +49,8 @@ assign result.ex_valid = '0;
 assign result.ex = '0;
 assign result.ex_tval = '0;
 
-// TODO: flush pipeline
-
 wire _unused = &{ clk, rst };
 
 endmodule
 
-`endif // __CSRFILE_SV__
+`endif // __CSR_SV__

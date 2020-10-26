@@ -275,8 +275,6 @@ assign rd_val = commit.data.rd_val;
 
 // Void all unused signals
 (* keep = "soft" *) wire _unused = &{
-  ex_result.data,
-  ex_result.valid,
   ints
 };
 
