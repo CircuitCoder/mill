@@ -58,7 +58,7 @@ decoupled #(
 // TODO: make data mem request the privileged one
 mem_arbiter #(
   .CNT(2),
-  .QUEUE_DEPTH(2)
+  .QUEUE_DEPTH(1)
 ) arbiter (
   .master_req(mem_sub_req),
   .master_resp(mem_sub_resp),
@@ -136,7 +136,7 @@ decoupled #(
 
 queue #(
   .Data(fetched_instr),
-  .DEPTH(2),
+  .DEPTH(1),
   .PIPE(1)
 ) if_id_queue (
   .enq(if_fetched),
@@ -157,7 +157,7 @@ decoupled #(
 
 queue #(
   .Data(decoded_instr),
-  .DEPTH(2),
+  .DEPTH(1),
   .PIPE(1)
 ) id_ex_queue (
   .enq(id_decoded),
@@ -179,7 +179,7 @@ decoupled #(
 // Currently we are branching from ex, hence we don't have to flush the ex_commit_queue and ex itself
 queue #(
   .Data(exec_result),
-  .DEPTH(2),
+  .DEPTH(1),
   .PIPE(1)
 ) ex_commit_queue (
   .enq(ex_result),

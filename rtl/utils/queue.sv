@@ -2,6 +2,7 @@
 `define __QUEUE_SV__
 
 `include "types.sv"
+`include "utils/counter.sv"
 
 // TODO: 0-depth queue
 module queue #(
@@ -19,14 +20,32 @@ module queue #(
   input rst
 );
 
-localparam IDX_WIDTH = $clog2(DEPTH);
-typedef bit [IDX_WIDTH-1:0] idx;
-
 Data store [DEPTH];
+
+localparam IDX_WIDTH = DEPTH == 1 ? 1 : $clog2(DEPTH);
+typedef logic [IDX_WIDTH-1:0] idx;
+
 idx head, tail;
+logic head_tick, tail_tick;
+
+counter #(.BOUND(DEPTH)) head_cnt (
+  .current(head),
+  .tick(head_tick),
+  .flush,
+  .clk, .rst
+);
+
+counter #(.BOUND(DEPTH)) tail_cnt (
+  .current(tail),
+  .tick(tail_tick),
+  .flush,
+  .clk, .rst
+);
+
 wire full, empty;
-assign full = tail + 1 === head;
-assign empty = tail === head;
+logic maybe_full;
+assign full = tail == head && maybe_full;
+assign empty = tail == head && !maybe_full;
 
 if(PIPE) begin
   assign enq.ready = (!full) || deq.valid;
@@ -42,17 +61,13 @@ end else begin
   assign deq.data = store[head];
 end
 
+assign head_tick = deq.valid && deq.ready;
+assign tail_tick = enq.valid && enq.ready;
+
 always_ff @(posedge clk or posedge rst) begin
-  if(rst) begin
-    head <= 0;
-    tail <= 0;
-  end else if(flush) begin
-    head <= 0;
-    tail <= 0;
-  end else begin
-    if(enq.valid && enq.ready) tail <= tail + 1;
-    if(deq.valid && deq.ready) head <= head + 1;
-  end
+  if(rst) maybe_full <= '0;
+  else if(flush) maybe_full <= '0;
+  else if(head_tick != tail_tick) maybe_full <= tail_tick;
 end
 
 always_ff @(posedge clk) begin

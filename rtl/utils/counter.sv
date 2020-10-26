@@ -3,25 +3,27 @@
 
 module counter #(
   parameter int BOUND = 1,
-  parameter int WIDTH = $clog2(BOUND)
+  parameter int WIDTH = BOUND == 1 ? 1 : $clog2(BOUND)
 ) (
   input var tick,
-  output var current,
+  output var [WIDTH-1:0] current,
+
+  input flush,
 
   input var clk,
   input var rst
 );
 
 if(BOUND === 1) begin
-  logic _unused = &{ tick, clk, rst };
+  logic _unused = &{ tick, clk, rst, flush };
   assign current = '0;
 end else begin
-  parameter WIDTH = $clog2(BOUND);
   logic [WIDTH-1:0] cnt;
   assign current = cnt;
 
   always_ff @(posedge clk or posedge rst) begin
     if(rst) cnt <= 0;
+    else if(flush) cnt <= 0;
     else if(tick) begin
       if(cnt === BOUND - 1) begin
         cnt <= 0;
