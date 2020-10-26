@@ -3,6 +3,8 @@ repo_url: https://github.com/CircuitCoder/mill
 repo_name: CircuitCoder/mill
 edit_uri: edit/master/doc/docs/
 
+copyright: Copyright © Mill developers, released under CC BY-NC-SA 4.0
+
 plugins:
   - search:
   - git-revision-date-localized:
@@ -22,6 +24,7 @@ theme:
     - navigation.instant
   icon:
     repo: fontawesome/brands/github
+  custom_dir: overrides
 
 nav:
   - 主页: index.md
