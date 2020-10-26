@@ -19,51 +19,71 @@ module instr_fetch #(
   input rst
 );
 
-// Addr queue
-gpreg sent_addr;
-logic sent;
+typedef enum {
+  STATE_REQ,
+  STATE_WAIT_RESP, // Waiting for memory
+  STATE_WAIT_DOWNSTREAM, // Waiting for downstream
+  STATE_FLUSHED // Flushed!
+} state_t;
+
+state_t state, state_n;
+
+instr holding_instr;
 
 assign mem_req.data.a = pc.data;
 assign mem_req.data.we = '0;
 assign mem_req.data.be = 'X;
 assign mem_req.data.d = 'X;
-assign mem_req.valid = pc.valid && !sent && !flush;
-assign pc.ready = mem_req.ready;
 
-instr slot;
-logic slot_taken;
+assign fetched.data.pc = pc.data;
+assign fetched.data.raw = state == STATE_WAIT_DOWNSTREAM ? holding_instr : mem_resp.data;
 
-assign fetched.data.pc = sent ? sent_addr : pc.data;
-assign fetched.data.raw = slot_taken ? slot : mem_resp.data;
-assign fetched.valid = slot_taken || mem_resp.valid;
-assign mem_resp.ready = !slot_taken;
+logic sending, receiving, draining;
+
+assign sending = mem_req.valid && mem_req.ready;
+assign receiving = mem_resp.valid && mem_resp.ready;
+assign draining = fetched.valid && fetched.ready;
+
+assign mem_req.valid = state == STATE_REQ && pc.valid && !flush;
+assign pc.ready = draining;
+
+assign fetched.valid = state == STATE_WAIT_DOWNSTREAM || mem_resp.valid && state != STATE_FLUSHED;
+assign mem_resp.ready = state != STATE_WAIT_DOWNSTREAM;
+
+always_comb begin
+  state_n = state;
+
+  unique case(state)
+    STATE_REQ: begin
+      if(flush) state_n = STATE_REQ;
+      else if(sending && receiving && draining) state_n = STATE_REQ;
+      else if(sending && receiving) state_n = STATE_WAIT_DOWNSTREAM;
+      else if(sending) state_n = STATE_WAIT_RESP;
+    end
+    STATE_WAIT_RESP: begin
+      assert(!mem_req.valid);
+      if(flush) state_n = STATE_FLUSHED;
+      else if(receiving && draining) state_n = STATE_REQ;
+      else if(receiving) state_n = STATE_WAIT_DOWNSTREAM;
+    end
+    STATE_WAIT_DOWNSTREAM: begin
+      if(flush) state_n = STATE_REQ;
+      else if(draining) state_n = STATE_REQ;
+    end
+    STATE_FLUSHED: begin
+      if(receiving) state_n = STATE_REQ;
+    end
+  endcase
+end
 
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
-    sent <= '0;
-    slot_taken <= '0;
+    state <= STATE_REQ;
   end else begin
-    // Sent logic
-    if(mem_req.valid && mem_req.ready) begin
-      sent_addr <= pc.data;
-    end
+    state <= state_n;
 
-    if(mem_resp.valid && mem_resp.ready) begin
-      sent <= '0;
-    end else if(mem_req.valid && mem_req.ready) begin
-      sent <= '1;
-    end
-
-    // Slot logic
-    if(mem_resp.valid && mem_resp.ready) begin
-      slot <= mem_resp.data;
-    end
-
-    if(fetched.ready) begin
-      slot_taken <= '0;
-    end else if(mem_resp.valid && mem_resp.ready) begin
-      slot_taken <= '1;
-    end
+    // Holding data
+    if(receiving) holding_instr <= mem_resp.data;
   end
 end
 

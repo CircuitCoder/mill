@@ -15,20 +15,34 @@ module mem #(
   input rst
 );
 
-logic request_sent;
+typedef enum {
+  STATE_CALC, STATE_REQ, STATE_RESP
+} state_t;
 
+state_t state, state_n;
+
+// Address calculation
 addr raw;
-assign raw = decoded.data.rs1_val + decoded.data.imm;
-addr aligned;
-assign aligned = { raw[31:2], 2'b00 };
-logic [1:0] shift;
-assign shift = raw[1:0];
 
-assign mem_req.data.a = aligned;
-
-logic [3:0] be;
 logic inval_align;
 logic inval_instr;
+
+addr aligned;
+addr aligned_pipe;
+
+logic [1:0] shift;
+logic [1:0] shift_pipe;
+
+logic [3:0] be;
+logic [3:0] be_pipe;
+
+mtrans shifted_req;
+mtrans shifted_req_pipe;
+
+assign raw = decoded.data.rs1_val + decoded.data.imm;
+assign aligned = { raw[31:2], 2'b00 };
+assign shift = raw[1:0];
+
 assign inval_instr = decoded.data.funct3[2] && (
   decoded.data.funct3[1:0] == 2'b10 || decoded.data.op == INSTR_STORE
 );
@@ -55,35 +69,46 @@ always_comb begin
   endcase
 end
 
+assign shifted_req = decoded.data.rs2_val <<< (shift * 8);
+
+always_ff @(posedge clk) begin
+  aligned_pipe <= aligned;
+  shift_pipe <= shift;
+  be_pipe <= be;
+  shifted_req_pipe <= shifted_req;
+end
+
+assign mem_req.data.a = aligned_pipe;
+assign mem_req.data.be = be_pipe;
+assign mem_req.data.d = shifted_req_pipe;
+
 always_comb begin
   unique case(decoded.data.op)
     INSTR_STORE: mem_req.data.we = '1;
     INSTR_LOAD: mem_req.data.we = '0;
+    default: mem_req.data.we = 'X;
   endcase
 end
 
-assign mem_req.data.be = be;
-assign mem_req.data.d = decoded.data.rs2_val <<< (shift * 8);
-assign mem_req.valid = decoded.valid && !request_sent && !inval_instr && !inval_align;
+assign mem_req.valid = state == STATE_REQ;
 
 assign mem_resp.ready = '1;
-assign decoded.ready = mem_resp.valid || inval_instr || inval_align;
 
-mtrans shifted;
-assign shifted = mem_resp.data >>> (shift * 8);
+mtrans shifted_resp;
+assign shifted_resp = mem_resp.data >>> (shift_pipe * 8);
 gpreg readout;
 
 always_comb begin
   unique case(decoded.data.funct3)
     // LBx
-    3'b000: readout = unsigned'(32'(signed'(shifted[7:0])));
-    3'b100: readout = { 24'b0, shifted[7:0] } ;
+    3'b000: readout = unsigned'(32'(signed'(shifted_resp[7:0])));
+    3'b100: readout = { 24'b0, shifted_resp[7:0] } ;
 
     // LH
-    3'b001: readout = unsigned'(32'(signed'(shifted[15:0])));
-    3'b101: readout = { 16'b0, shifted[15:0] } ;
+    3'b001: readout = unsigned'(32'(signed'(shifted_resp[15:0])));
+    3'b101: readout = { 16'b0, shifted_resp[15:0] } ;
 
-    3'b010: readout = shifted;
+    3'b010: readout = shifted_resp;
     default: readout = 'hX;
   endcase
 end
@@ -110,16 +135,36 @@ always_comb begin
   end
 end
 
-always_ff @(posedge clk or posedge rst) begin
-  if(rst) begin
-    request_sent <= '0;
-  end else begin
-    if(mem_resp.valid) begin
-      request_sent <= '0;
-    end else if(mem_req.valid && mem_req.ready) begin
-      request_sent <= '1;
+/* State transfer and output validity */
+always_comb begin
+  state_n = state;
+  decoded.ready = '0;
+
+  unique case(state)
+    STATE_CALC: begin
+      if(inval_align || inval_instr) decoded.ready = '1;
+      else if(decoded.valid) state_n = STATE_REQ;
     end
-  end
+    STATE_REQ: begin
+      if(mem_req.ready && !mem_resp.valid) begin
+        state_n = STATE_RESP;
+      end else begin
+        decoded.ready = '1;
+        state_n = STATE_CALC;
+      end
+    end
+    STATE_RESP: begin
+      if(mem_resp.valid) begin
+        decoded.ready = '1;
+        state_n = STATE_CALC;
+      end
+    end
+  endcase
+end
+
+always_ff @(posedge clk or posedge rst) begin
+  if(rst) state <= STATE_CALC;
+  else state <= state_n;
 end
 
 endmodule

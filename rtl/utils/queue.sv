@@ -44,11 +44,11 @@ counter #(.BOUND(DEPTH)) tail_cnt (
 
 wire full, empty;
 logic maybe_full;
-assign full = tail == head && maybe_full;
-assign empty = tail == head && !maybe_full;
+assign full = (tail == head) && maybe_full;
+assign empty = (tail == head) && !maybe_full;
 
 if(PIPE) begin
-  assign enq.ready = (!full) || deq.valid;
+  assign enq.ready = (!full) || deq.ready;
 end else begin
   assign enq.ready = !full;
 end
