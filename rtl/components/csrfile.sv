@@ -101,23 +101,24 @@ always_comb begin
 end
 
 assign resp.d = read_pipe;
-gpreg req_data_pipe;
 
-gpreg written;
+gpreg write, write_pipe;
 always_comb begin
   case (req.data.t)
-    CSRW: written = req_data_pipe;
-    CSRS: written = read_pipe | req.data.d;
-    CSRC: written = read_pipe & ~(req.data.d);
-    default: written = 'X;
+    CSRW: write = req.data.d;
+    CSRS: write = read | req.data.d;
+    CSRC: write = read & ~(req.data.d);
+    default: write = 'X;
   endcase
 end
 
 assign state_n = (state == STATE_READING && req.valid) ? STATE_COMMIT : STATE_READING;
+csr_addr req_addr_pipe;
 
 always_ff @(posedge clk or posedge rst) begin
   read_pipe <= read;
-  req_data_pipe <= req.data.d;
+  write_pipe <= write;
+  req_addr_pipe <= req.data.a;
 
   if(rst) begin
     state <= STATE_READING;
@@ -157,29 +158,29 @@ always_ff @(posedge clk or posedge rst) begin
     mie <= '0;
   end else if(effect.t == CSR_EFF_RET) begin
     mie <= mpie;
-  end else if(req.valid && state == STATE_COMMIT) begin
-    case (req.data.a)
+  end else if(state == STATE_COMMIT) begin // TODO: asserts irrevocable
+    case (req_addr_pipe)
       CSR_MSTATUS: begin
-        mpie <= written[7];
-        mie <= written[3];
+        mpie <= write_pipe[7];
+        mie <= write_pipe[3];
       end
       CSR_MIE: begin
-        meie <= written[11];
-        mtie <= written[7];
-        msie <= written[3];
+        meie <= write_pipe[11];
+        mtie <= write_pipe[7];
+        msie <= write_pipe[3];
       end
-      CSR_MTVEC: mtvec <= { written[31:2], 2'b0 };
-      CSR_MSCRATCH: mscratch <= written;
-      CSR_MEPC: mepc <= written;
-      CSR_MCAUSE: mcause <= written;
-      CSR_MTVAL: mtval <= written;
+      CSR_MTVEC: mtvec <= { write_pipe[31:2], 2'b0 };
+      CSR_MSCRATCH: mscratch <= write_pipe;
+      CSR_MEPC: mepc <= write_pipe;
+      CSR_MCAUSE: mcause <= write_pipe;
+      CSR_MTVAL: mtval <= write_pipe;
 
-      CSR_MCYCLE: cycle <= { cycle[63:32], written };
-      CSR_MINSTRET: instret <= { instret[63:32], written };
-      CSR_MCYCLEH: cycle <= { written, cycle[31:0] };
-      CSR_MINSTRETH: instret <= { written, instret[31:0] };
+      CSR_MCYCLE: cycle <= { cycle[63:32], write_pipe };
+      CSR_MINSTRET: instret <= { instret[63:32], write_pipe };
+      CSR_MCYCLEH: cycle <= { write_pipe, cycle[31:0] };
+      CSR_MINSTRETH: instret <= { write_pipe, instret[31:0] };
 
-      CSR_MCOUNTINHIBIT: countinhibit <= written;
+      CSR_MCOUNTINHIBIT: countinhibit <= write_pipe;
       default: ; // Do nothing
     endcase
   end
