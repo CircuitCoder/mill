@@ -44,7 +44,7 @@ assign sending = mem_req.valid && mem_req.ready;
 assign receiving = mem_resp.valid && mem_resp.ready;
 assign draining = fetched.valid && fetched.ready;
 
-assign mem_req.valid = state == STATE_REQ && pc.valid && !flush;
+assign mem_req.valid = state == STATE_REQ && pc.valid;
 assign pc.ready = draining;
 
 assign fetched.valid = state == STATE_WAIT_DOWNSTREAM || mem_resp.valid && state != STATE_FLUSHED;
@@ -55,7 +55,10 @@ always_comb begin
 
   unique case(state)
     STATE_REQ: begin
-      if(flush) state_n = STATE_REQ;
+      if(flush) begin
+        if(sending && !receiving) state_n = STATE_FLUSHED;
+        else state_n = STATE_REQ;
+      end
       else if(sending && receiving && draining) state_n = STATE_REQ;
       else if(sending && receiving) state_n = STATE_WAIT_DOWNSTREAM;
       else if(sending) state_n = STATE_WAIT_RESP;
