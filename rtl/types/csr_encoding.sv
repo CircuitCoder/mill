@@ -1,5 +1,5 @@
-`ifndef __CSR_ENCODE_SV__
-`define __CSR_ENCODE_SV__
+`ifndef __CSR_ENCODING_SV__
+`define __CSR_ENCODING_SV__
 
 `include "types.sv"
 
@@ -65,4 +65,4 @@ typedef struct packed {
   gpreg tval;
 } csr_effect;
 
-`endif // __CSR_ENCODE_SV__
+`endif // __CSR_ENCODING_SV__

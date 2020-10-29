@@ -19,6 +19,6 @@ typedef struct packed {
 `include "types/decoupled.sv"
 `include "types/instr.sv"
 `include "types/exec_result.sv"
-`include "types/csr_encode.sv"
+`include "types/csr_encoding.sv"
 
 `endif // __TYPES_SV__

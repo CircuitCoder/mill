@@ -20,6 +20,13 @@ module csrfile #() (
   input rst
 );
 
+typedef enum {
+  STATE_READING,
+  STATE_COMMIT
+} state_t;
+
+state_t state, state_n;
+
 /* Status */
 // FS = XS = SD = 0
 // Global interrupt switches
@@ -55,8 +62,9 @@ assign misa = (1 << 30) | (1 << 8);
 
 // Single cycle r/w
 
-assign req.ready = '1;
+assign req.ready = state == STATE_COMMIT;
 gpreg read;
+gpreg read_pipe;
 
 always_comb begin
   resp.exists = '1;
@@ -92,16 +100,30 @@ always_comb begin
   endcase
 end
 
-assign resp.d = read;
+assign resp.d = read_pipe;
+gpreg req_data_pipe;
 
 gpreg written;
 always_comb begin
   case (req.data.t)
-    CSRW: written = req.data.d;
-    CSRS: written = read | req.data.d;
-    CSRC: written = read & ~(req.data.d);
+    CSRW: written = req_data_pipe;
+    CSRS: written = read_pipe | req.data.d;
+    CSRC: written = read_pipe & ~(req.data.d);
     default: written = 'X;
   endcase
+end
+
+assign state_n = (state == STATE_READING && req.valid) ? STATE_COMMIT : STATE_READING;
+
+always_ff @(posedge clk or posedge rst) begin
+  read_pipe <= read;
+  req_data_pipe <= req.data.d;
+
+  if(rst) begin
+    state <= STATE_READING;
+  end else begin
+    state <= state_n;
+  end
 end
 
 always_ff @(posedge clk or posedge rst) begin
@@ -135,7 +157,7 @@ always_ff @(posedge clk or posedge rst) begin
     mie <= '0;
   end else if(effect.t == CSR_EFF_RET) begin
     mie <= mpie;
-  end else if(req.valid) begin
+  end else if(req.valid && state == STATE_COMMIT) begin
     case (req.data.a)
       CSR_MSTATUS: begin
         mpie <= written[7];
