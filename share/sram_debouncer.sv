@@ -28,6 +28,7 @@ module sram_debouncer #(
   input var logic resp_ready,
 
   input var clk,
+  input var clk_90, // CLK + 90deg
   input var rst
 );
 
@@ -35,6 +36,7 @@ module sram_debouncer #(
 logic [DATA_WIDTH-1:0] wdata_ff;
 logic [ADDR_WIDTH-1:0] addr_ff;
 logic [DATA_WIDTH/8-1:0] wbe_ff;
+logic [DATA_WIDTH/8-1:0] wbe_ff_gated; // For passing onto SRAM's wbe
 logic holding;
 
 typedef logic [$clog2(CYCLE)-1:0] counter_t;
@@ -50,8 +52,8 @@ assign enq = req_valid && req_ready;
 assign deq = resp_valid && resp_ready;
 
 assign sram_addr = addr_ff;
-assign sram_wbe = wbe_ff;
 assign sram_rbe = ~wbe_ff;
+assign sram_wbe = wbe_ff_gated;
 
 for(genvar i = 0; i < DATA_WIDTH/8; ++i) begin
   assign sram_data[i*8+:8] = wbe_ff[i] ? wdata_ff[i*8+:8] : 'Z;
@@ -81,9 +83,16 @@ always_ff @(posedge clk or posedge rst) begin
       wdata_ff <= wdata;
     end
 
-    if(enq && !deq) holding <= '1;
-    else if(deq && !enq) holding <= '0;
+    if(enq) begin
+      holding <= '1;
+      assert(!holding || deq);
+    end else if(deq) holding <= '0;
   end
+end
+
+localparam FIRST_CNT = CYCLE == 1 ? 0 : 1;
+for(genvar i = 0; i < DATA_WIDTH/8; ++i) begin
+  assign wbe_ff_gated[i] = wbe_ff[i] && holding && !(counter == FIRST_CNT && clk && !clk_90) && !(counter == '0 && !clk && !clk_90);
 end
 
 endmodule
