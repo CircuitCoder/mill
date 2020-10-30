@@ -2,7 +2,7 @@ GTKWave 是一个开源的波形浏览器，支持 VCD 和 FST 格式。
 
 FST 是一种波形记录格式，为 Verilator 所支持。相比于 VCD，FST 文件的大小更小，且支持 Enum，Struct 等 SystemVerilog 专有的功能。
 
-使用 Mill 运行 RTL 代码的仿真测试时，可以传递 `-i path/to/wave.fst` 参数，让测试框架输出波形文件。之后，可以直接使用 GTKWave 打开：
+使用 Mill 运行 RTL 代码的仿真测试时，可以传递 `-t path/to/wave.fst` 参数，让测试框架输出波形文件。之后，可以直接使用 GTKWave 打开：
 
 - On Linux: `gtkwave path/to/wave.fst path/to/config.wcfg`
 - On Windows: 推荐安装 VcXSrv 之后在 WSL 中安装 gtkwave
