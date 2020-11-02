@@ -30,8 +30,10 @@ assign jalr_dest_raw = decoded.data.rs1_val + decoded.data.imm;
 assign jalr_dest = { jalr_dest_raw[31:1], 1'b0 };
 
 always_comb begin
-  result = 'X;
+  result.br_valid = '0;
+  result.br_target = 'X;
   result.rd_idx = decoded.data.rd;
+  result.rd_val = 'X;
 
   invalid_priv = '0;
   default_ex_valid = '0;

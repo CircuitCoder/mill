@@ -20,9 +20,9 @@ assign from_imm = decoded.data.funct3[2];
 logic inval_funct3;
 assign inval_funct3 = decoded.data.funct3[1:0] == 2'b00;
 
-assign csrfile_req.data.a = decoded.data.imm[11:0];
+assign csrfile_req.data.a = csr_addr'(decoded.data.imm[11:0]);
 assign csrfile_req.data.d = from_imm ? { 27'b0, decoded.data.rs1 } : decoded.data.rs1_val;
-assign csrfile_req.data.t = decoded.data.funct3[1:0];
+assign csrfile_req.data.t = csr_req_type'(decoded.data.funct3[1:0]);
 
 // Write check! We cannot write to xRO fields
 logic is_dest_ro;

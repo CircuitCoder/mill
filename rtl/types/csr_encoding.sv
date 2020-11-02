@@ -3,40 +3,39 @@
 
 `include "types.sv"
 
-typedef enum [1:0] {
-  CSRW = 2'b01, CSRS = 2'b10, CSRC = 2'b11
-} csr_req_type;
+typedef logic [1:0] csr_req_type;
+localparam csr_req_type CSRW = 2'b01, CSRS = 2'b10, CSRC = 2'b11;
 
-typedef enum [11:0] {
-  // MRO
-  CSR_MVENDORID = 'hF11,
-  CSR_MARCHID = 'hF12,
-  CSR_MIMPID = 'hF13,
-  CSR_MHARTID = 'hF14,
+typedef logic [11:0] csr_addr;
 
-  // MRW
-  CSR_MSTATUS = 'h300,
-  CSR_MISA = 'h301,
-  CSR_MIE = 'h304,
-  CSR_MTVEC = 'h305,
+// MRO
+localparam csr_addr CSR_MVENDORID = 'hF11;
+localparam csr_addr CSR_MARCHID = 'hF12;
+localparam csr_addr CSR_MIMPID = 'hF13;
+localparam csr_addr CSR_MHARTID = 'hF14;
 
-  CSR_MSCRATCH = 'h340,
-  CSR_MEPC = 'h341,
-  CSR_MCAUSE = 'h342,
-  CSR_MTVAL = 'h343,
-  CSR_MIP = 'h344,
+// MRW
+localparam csr_addr CSR_MSTATUS = 'h300;
+localparam csr_addr CSR_MISA = 'h301;
+localparam csr_addr CSR_MIE = 'h304;
+localparam csr_addr CSR_MTVEC = 'h305;
 
-  // We don't supports PMP
+localparam csr_addr CSR_MSCRATCH = 'h340;
+localparam csr_addr CSR_MEPC = 'h341;
+localparam csr_addr CSR_MCAUSE = 'h342;
+localparam csr_addr CSR_MTVAL = 'h343;
+localparam csr_addr CSR_MIP = 'h344;
 
-  // We only supports two of the mandatory timers
-  CSR_MCYCLE = 'hb00,
-  CSR_MINSTRET = 'hb02,
+// We don't supports PMP
 
-  CSR_MCYCLEH = 'hb80,
-  CSR_MINSTRETH = 'hb82,
+// We only supports two of the mandatory timers
+localparam csr_addr CSR_MCYCLE = 'hb00;
+localparam csr_addr CSR_MINSTRET = 'hb02;
 
-  CSR_MCOUNTINHIBIT = 'h320
-} csr_addr;
+localparam csr_addr CSR_MCYCLEH = 'hb80;
+localparam csr_addr CSR_MINSTRETH = 'hb82;
+
+localparam csr_addr CSR_MCOUNTINHIBIT = 'h320;
 
 typedef struct packed {
   csr_req_type t;
