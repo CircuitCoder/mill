@@ -6,8 +6,9 @@ module sram_debouncer #(
   /* SRAM interface */
   output var logic [ADDR_WIDTH-1:0] sram_addr,
 
-  output var logic [DATA_WIDTH/8-1:0] sram_wbe,
-  output var logic [DATA_WIDTH/8-1:0] sram_rbe,
+  output var logic sram_we_n,
+  output var logic sram_re_n,
+  output var logic [DATA_WIDTH/8-1:0] sram_be_n,
 
   inout tri logic [DATA_WIDTH-1:0] sram_data,
 
@@ -17,6 +18,7 @@ module sram_debouncer #(
 
   input var logic [DATA_WIDTH-1:0] wdata,
 
+  input var logic we,
   input var logic [DATA_WIDTH/8-1:0] wbe,
 
   input var logic req_valid,
@@ -33,11 +35,16 @@ module sram_debouncer #(
 );
 
 // FF
+logic we_ff;
 logic [DATA_WIDTH-1:0] wdata_ff;
 logic [ADDR_WIDTH-1:0] addr_ff;
-logic [DATA_WIDTH/8-1:0] wbe_ff;
-logic [DATA_WIDTH/8-1:0] wbe_ff_gated; // For passing onto SRAM's wbe
+logic [DATA_WIDTH/8-1:0] be_ff;
 logic holding;
+
+assign sram_be_n = ~be_ff;
+assign sram_addr = addr_ff;
+assign sram_data = we_ff ? wdata_ff : 'Z;
+assign rdata = sram_data;
 
 typedef logic [$clog2(CYCLE)-1:0] counter_t;
 counter_t counter, counter_n, counter_inc;
@@ -51,16 +58,6 @@ logic enq, deq;
 assign enq = req_valid && req_ready;
 assign deq = resp_valid && resp_ready;
 
-assign sram_addr = addr_ff;
-assign sram_rbe = ~wbe_ff;
-assign sram_wbe = wbe_ff_gated;
-
-for(genvar i = 0; i < DATA_WIDTH/8; ++i) begin
-  assign sram_data[i*8+:8] = wbe_ff[i] ? wdata_ff[i*8+:8] : 'Z;
-end
-
-assign rdata = sram_data;
-
 always_comb begin
   if(counter != 0) counter_n = counter_inc;
   else if(enq) counter_n = counter_inc;
@@ -70,15 +67,17 @@ end
 always_ff @(posedge clk or posedge rst) begin
   if(rst) begin
     counter <= 0;
-    wbe_ff <= '0;
+    we_ff <= '0;
     holding <= '0;
 
     addr_ff <= 'X;
     wdata_ff <= 'X;
+    be_ff <= 'X;
   end else begin
     counter <= counter_n;
     if(enq) begin
-      wbe_ff <= wbe;
+      we_ff <= we;
+      be_ff <= we ? wbe : ~((DATA_WIDTH/8)'(0));
       addr_ff <= addr;
       wdata_ff <= wdata;
     end
@@ -91,8 +90,7 @@ always_ff @(posedge clk or posedge rst) begin
 end
 
 localparam FIRST_CNT = CYCLE == 1 ? 0 : 1;
-for(genvar i = 0; i < DATA_WIDTH/8; ++i) begin
-  assign wbe_ff_gated[i] = wbe_ff[i] && holding && !(counter == FIRST_CNT && clk && !clk_90) && !(counter == '0 && !clk && !clk_90);
-end
+assign sram_we_n = !(we_ff && holding && !(counter == FIRST_CNT && clk && !clk_90) && !(counter == '0 && !clk && !clk_90));
+assign sram_re_n = !((!we_ff) && holding);
 
 endmodule
