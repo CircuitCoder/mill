@@ -3,7 +3,6 @@
 
 #include <verilated_fst_c.h>
 
-#include <concepts>
 #include <vector>
 #include <string>
 #include <optional>
@@ -17,7 +16,7 @@ namespace mill::bridge {
   const size_t ADDR_WIDTH = 32;
   const size_t DATA_WIDTH = 32;
 
-  template<std::unsigned_integral T>
+  template<typename T>
   void assign_data(T &data, const rust::Vec<uint64_t> &input) {
     data = input[0];
   }
