@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.16.3)
 project(mill)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_compile_options(-Wall -Wextra -pedantic -std=c++20)
+add_compile_options(-Wall -Wextra -pedantic -std=c++17)
 find_program(CXXBRIDGE cxxbridge)
 
 set(CXX_BRIDGE_SRC ${CMAKE_CURRENT_SOURCE_DIR}/../rust/rtl.rs)
@@ -39,7 +39,7 @@ verilate(
   TRACE_FST
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../rtl
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/verilated
-  VERILATOR_ARGS -Wall --trace-params --trace-structs --top-module top
+  VERILATOR_ARGS --trace-params --trace-structs --top-module top
 )
 
 install(TARGETS millrtl)
