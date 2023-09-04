@@ -39,7 +39,7 @@ verilate(
   TRACE_FST
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../rtl
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/verilated
-  VERILATOR_ARGS -Wall --trace-params --trace-structs --top-module top
+  VERILATOR_ARGS -Wall -Wno-UNUSEDPARAM --trace-params --trace-structs --top-module top
 )
 
 install(TARGETS millrtl)
