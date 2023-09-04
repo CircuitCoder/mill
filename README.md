@@ -20,12 +20,12 @@ See `rtl/top.sv`
 
 To run the unit test included in this repository, you will need to install the following dependencies first:
 
-- verilator, tested on 4.0.36
-- GCC (g++) 10, tested on 10.2.0. clang won't work (for now) because of its lacking the standard concept library.
-- rust (rustc, cargo), tested on 1.48.0-nightly
-- cxxbridge, tested on 0.4.7. This binary is provided in the `cxxbridge-cmd` rust crate.
-- cmake, tested on 3.18.3. You may want to change the minimal version specified in the bridge/CMakeLists.txt to match your cmake version.
-- ninja or makefile, tested on ninja 1.10.1. Ninja is recommended for better build dependency handling.
+- verilator, tested on 5.006
+- GCC (g++) 10, tested on 12.2.0. clang won't work (for now) because of its lacking the standard concept library.
+- rust (rustc, cargo), tested on 1.74.0-nightly
+- cxxbridge, tested on 1.0.107. This binary is provided in the `cxxbridge-cmd` rust crate.
+- cmake, tested on 3.25.1. You may want to change the minimal version specified in the bridge/CMakeLists.txt to match your cmake version.
+- ninja or makefile, tested on ninja 1.11.1. Ninja is recommended for better build dependency handling.
 
 Then, just simple invoke `cargo run -- -h` and you will get the help for the test runner.
 

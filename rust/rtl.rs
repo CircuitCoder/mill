@@ -8,7 +8,7 @@ mod ffi {
         data: u32, // TODO: return as CxxVec or CxxString
     }
 
-    extern "C" {
+    unsafe extern "C++" {
         include!("bridge.h");
 
         type MemReq;
